@@ -10,7 +10,17 @@ public class AuthorizationService {
         this.userStore = userStore;
     }
 
+    Scanner scanner = new Scanner(System.in);
+
     void startAuthorization() {
+        User userExample[] = new User[4];
+        userExample[0] = new User("Misha","123");
+        userExample[1] = new User("Lesha","2345");
+        userExample[2] = new User("Tania","password");
+        userExample[3] = new User("Arseniy","qqqq");
+        for( int i = 0; i < 4; i++){
+            userStore.addUser(userExample[i]);
+        }
         if (isLogin()) {
             login();
         }
@@ -19,18 +29,28 @@ public class AuthorizationService {
     User login() {
 //            1. Ask for name
 //            2. Ask for password
-//            3. Ask UserStore for user:  userStore.getUser(name, pass)
-        Scanner scanner = new Scanner(System.in);
+//            3. Ask UserStore for user:  userStore.getUser(name, passL)
+
+        System.out.println("Name user:");
+        String name = scanner.next();
+        while(true){
+            if(!userStore.isUserExist(name)){
+                System.out.println("This user doesn't exist");
+            }
+            else
+                break;
+            name = scanner.next();
+        }
+
+        System.out.println("Password:");
         while(true) {
-            System.out.println("Name user:");
-            String name = scanner.next();
-            System.out.println("Password:");
             String password = scanner.next();
             if (userStore.getUser(name, password) != null) {
-                System.out.println("Access");
+                System.out.println("Hello ");
+                System.out.println(name);
                 break;
             } else {
-                System.out.println("Incorrect data");
+                System.out.println("Incorrect password");
             }
         }
 
@@ -42,7 +62,6 @@ public class AuthorizationService {
         // 1. Ask for name
         // 2. Ask for pass
         // 3. Add user to UserStore: userStore.addUser(user)
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Enter your user name");
         String name = scanner.next();
         while( true ){
