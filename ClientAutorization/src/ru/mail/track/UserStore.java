@@ -1,17 +1,18 @@
 package ru.mail.track;
 
 
+import java.util.ArrayList;
+
 public class UserStore {
 
-    User users[] = new User[100];
-    int count = 0;
+    ArrayList<User> users = new ArrayList<User>();
     // Вам нужно выбрать, как вы будете хранить ваших пользователей, например в массиве User users[] = new User[100];
 
     // проверить, есть ли пользователь с таким именем
     // если есть, вернуть true
     boolean isUserExist(String name) {
-        for (int i = 0; i < count; i++) {
-            if (users[i].getName().equals(name)) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getName().equals(name)) {
                 return true;
             }
         }
@@ -20,14 +21,14 @@ public class UserStore {
 
     // Добавить пользователя в хранилище
     void addUser(User user) {
-        users[count++] = user;
+        users.add(user);
     }
 
     // Получить пользователя по имени и паролю
     User getUser(String name, String pass) {
-        for (int i = 0; i < count; i++) {
-            if (users[i].getName().equals(name) && users[i].getPass().equals(pass)) {
-                return users[i];
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getName().equals(name) && users.get(i).getPass().equals(pass)) {
+                return users.get(i);
             }
         }
         return null;
