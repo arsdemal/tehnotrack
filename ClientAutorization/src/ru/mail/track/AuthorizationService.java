@@ -18,7 +18,7 @@ public class AuthorizationService {
         userExample[1] = new User("Lesha","2345");
         userExample[2] = new User("Tania","password");
         userExample[3] = new User("Arseniy","qqqq");
-        for( int i = 0; i < 4; i++){
+        for ( int i = 0; i < 4; i++) {
             userStore.addUser(userExample[i]);
         }
         if (isLogin()) {
@@ -33,21 +33,20 @@ public class AuthorizationService {
 
         System.out.println("Name user:");
         String name = scanner.next();
-        while(true){
-            if(!userStore.isUserExist(name)){
+        while (true) {
+            if (userStore.isUserExist(name)) {
+                break;
+            } else {
                 System.out.println("This user doesn't exist");
             }
-            else
-                break;
             name = scanner.next();
         }
 
         System.out.println("Password:");
-        while(true) {
+        while (true) {
             String password = scanner.next();
             if (userStore.getUser(name, password) != null) {
-                System.out.println("Hello ");
-                System.out.println(name);
+                System.out.println("Hello " + name);
                 break;
             } else {
                 System.out.println("Incorrect password");
@@ -63,14 +62,15 @@ public class AuthorizationService {
         // 2. Ask for pass
         // 3. Add user to UserStore: userStore.addUser(user)
         System.out.println("Enter your user name");
-        String name = scanner.next();
-        while( true ){
-            if(userStore.isUserExist(name)){
+        String name;
+        while (true) {
+            name = scanner.next();
+            if (!userStore.isUserExist(name)) {
+                break;
+            }
+            else {
                 System.out.println("A user with that username already exists");
             }
-            else
-                break;
-            name = scanner.next();
         }
         System.out.println("Create password");
         String password = scanner.next();
@@ -85,8 +85,7 @@ public class AuthorizationService {
         System.out.println("Do you want to register or login?");
         System.out.println("R/L?");
         String change = scanner.next();
-        String str = "R";
-        if(change.equals(str)){
+        if (change.equals("R")) {
             createUser();
             return false;
         }

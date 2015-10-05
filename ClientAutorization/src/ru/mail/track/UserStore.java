@@ -10,9 +10,11 @@ public class UserStore {
     // проверить, есть ли пользователь с таким именем
     // если есть, вернуть true
     boolean isUserExist(String name) {
-        for( int i = 0; i < count; i++)
-            if( users[i].getName().equals(name))
+        for (int i = 0; i < count; i++) {
+            if (users[i].getName().equals(name)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -23,8 +25,8 @@ public class UserStore {
 
     // Получить пользователя по имени и паролю
     User getUser(String name, String pass) {
-        for(int i = 0; i < count; i++) {
-            if( users[i].getName().equals(name) && users[i].getPass().equals(pass)) {
+        for (int i = 0; i < count; i++) {
+            if (users[i].getName().equals(name) && users[i].getPass().equals(pass)) {
                 return users[i];
             }
         }
