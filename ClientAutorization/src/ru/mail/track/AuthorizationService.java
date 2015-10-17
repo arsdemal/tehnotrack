@@ -1,5 +1,6 @@
 package ru.mail.track;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class AuthorizationService {
@@ -12,52 +13,33 @@ public class AuthorizationService {
 
     Scanner scanner = new Scanner(System.in);
 
-    void startAuthorization() {
-        User userExample[] = new User[4];
-        userExample[0] = new User("Misha","123");
-        userExample[1] = new User("Lesha","2345");
-        userExample[2] = new User("Tania","password");
-        userExample[3] = new User("Arseniy","qqqq");
-        for ( int i = 0; i < 4; i++) {
-            userStore.addUser(userExample[i]);
-        }
+    /*void startAuthorization() {
         if (isLogin()) {
             login();
         }
-    }
+    }*/
 
-    User login() {
+    User login(String name, String password) {
 //            1. Ask for name
 //            2. Ask for password
 //            3. Ask UserStore for user:  userStore.getUser(name, passL)
-
-        System.out.println("Name user:");
-        String name = scanner.next();
-        while (true) {
-            if (userStore.isUserExist(name)) {
-                break;
-            } else {
-                System.out.println("This user doesn't exist");
-            }
-            name = scanner.next();
-        }
-
-        System.out.println("Password:");
-        while (true) {
-            String password = scanner.next();
-            if (userStore.getUser(name, password) != null) {
-                System.out.println("Hello " + name);
-                break;
-            } else {
+        User user;
+        if ( userStore.isUserExist(name) == false){
+            System.out.println("A user with this name no exist");
+            return null;
+        } else {
+            if ( (user = userStore.getUser(name,password)) == null) {
                 System.out.println("Incorrect password");
+                return null;
+            } else {
+                return user;
             }
         }
 
 
-        return null;
     }
 
-    User createUser() {
+    User createUser() throws IOException {
         // 1. Ask for name
         // 2. Ask for pass
         // 3. Add user to UserStore: userStore.addUser(user)
@@ -76,10 +58,10 @@ public class AuthorizationService {
         String password = scanner.next();
         User user = new User(name,password);
         userStore.addUser(user);
-        return null;
+        return user;
     }
 
-    boolean isLogin() {
+    /*boolean isLogin() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome!");
         System.out.println("Do you want to register or login?");
@@ -91,5 +73,5 @@ public class AuthorizationService {
         }
 
         return true;
-    }
+    }*/
 }

@@ -1,11 +1,50 @@
 package ru.mail.track;
 
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class UserStore {
 
+    final static Charset ENCODING = StandardCharsets.UTF_8;
+
     ArrayList<User> users = new ArrayList<User>();
+
+    void readFile(String aFileName) throws IOException {
+        Path path = Paths.get(aFileName);
+        try (BufferedReader reader = Files.newBufferedReader(path, ENCODING)){
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(" ");
+                User user = new User(parts[0],parts[1]);
+                addUser(user);
+            }
+        }
+    }
+
+    void writeFile(String aFileName) throws IOException {
+        Path path = Paths.get(aFileName);
+        try (BufferedWriter writer = Files.newBufferedWriter(path, ENCODING)){
+            int userSize = users.size();
+            for (int i = 0; i < userSize; i++){
+                String line = new String(users.get(i).getName()+" "+users.get(i).getPass());
+                writer.write(line);
+                writer.newLine();
+            }
+        }
+    }
+
+
     // Вам нужно выбрать, как вы будете хранить ваших пользователей, например в массиве User users[] = new User[100];
 
     // проверить, есть ли пользователь с таким именем

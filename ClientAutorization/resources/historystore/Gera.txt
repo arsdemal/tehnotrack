@@ -1,0 +1,12 @@
+\user
+\user Fedor
+\user 
+\help
+\history
+fdfgdfg
+sdfsg
+sddfhsfhs
+\history
+\history 4
+\history
+\exit
