@@ -22,17 +22,17 @@ public class HistoryStore {
     final String FILE_USER_HISTORY_STORE;
 
     public HistoryStore(String name) throws IOException {
-        FILE_USER_HISTORY_STORE = "C:\\Users\\Arsdemal\\Documents\\Projects//" +
-                "\\JAVA\\tehnotrack\\ClientAutorization\\resources\\historystore\\" + name + ".txt";
+        FILE_USER_HISTORY_STORE = "C:\\Users\\Arsdemal\\Documents\\Projects\\JAVA\\project2\\tehnotrack\\" +
+                "ClientAutorization\\resources\\historystore\\" + name + ".txt";
         listHistory = new ArrayList<String>();
         File file = new File(FILE_USER_HISTORY_STORE);
         if (file.exists()) {
-            readFileHistory(FILE_USER_HISTORY_STORE);
+            readFileHistory();
         }
     }
 
-    void readFileHistory(String aFileName) throws IOException {
-        Path path = Paths.get(aFileName);
+    private void readFileHistory() throws IOException {
+        Path path = Paths.get(FILE_USER_HISTORY_STORE);
         try (BufferedReader reader = Files.newBufferedReader(path, ENCODING)){
             String line = null;
             while ((line = reader.readLine()) != null) {
@@ -41,7 +41,7 @@ public class HistoryStore {
         }
     }
 
-    void writeFileHistory() throws IOException {
+    private void writeFileHistory() throws IOException {
         Path path = Paths.get(FILE_USER_HISTORY_STORE);
         try (BufferedWriter writer = Files.newBufferedWriter(path, ENCODING)){
             for(String line : listHistory){
@@ -56,9 +56,23 @@ public class HistoryStore {
         writeFileHistory();
     }
 
+    public void findHistory(String str) {
+        int listHistorySize = listHistory.size();
+        boolean flag = false;
+        for (int i = 0; i < listHistorySize - 1; i++) {
+            if (listHistory.get(i).indexOf(str) != -1) {
+                System.out.println(listHistory.get(i));
+                flag = true;
+            }
+        }
+        if (!flag) {
+            System.out.println("Not found");
+        }
+    }
+
     public void printHistory () {
         int listHistorySize = listHistory.size();
-        for ( int i = 0; i < listHistorySize; i++) {
+        for ( int i = 0; i < listHistorySize - 1; i++) {
             System.out.println(listHistory.get(i));
         }
     }
@@ -72,7 +86,7 @@ public class HistoryStore {
         } else {
             i = listHistorySize - N;
         }
-        for ( ; i < listHistorySize; i++) {
+        for ( ; i < listHistorySize - 1; i++) {
             System.out.println(listHistory.get(i));
         }
     }

@@ -17,11 +17,13 @@ import java.util.Scanner;
 public class UserStore {
 
     final static Charset ENCODING = StandardCharsets.UTF_8;
+    final static String FILE_USER_STORE = "C:\\Users\\Arsdemal\\Documents\\Projects\\JAVA\\project2\\tehnotrack\\" +
+            "ClientAutorization\\resources\\userstore.txt";
 
     ArrayList<User> users = new ArrayList<User>();
 
-    void readFile(String aFileName) throws IOException {
-        Path path = Paths.get(aFileName);
+    void readFile() throws IOException {
+        Path path = Paths.get(FILE_USER_STORE);
         try (BufferedReader reader = Files.newBufferedReader(path, ENCODING)){
             String line = null;
             while ((line = reader.readLine()) != null) {
@@ -32,8 +34,8 @@ public class UserStore {
         }
     }
 
-    void writeFile(String aFileName) throws IOException {
-        Path path = Paths.get(aFileName);
+    void writeFile() throws IOException {
+        Path path = Paths.get(FILE_USER_STORE);
         try (BufferedWriter writer = Files.newBufferedWriter(path, ENCODING)){
             int userSize = users.size();
             for (int i = 0; i < userSize; i++){
