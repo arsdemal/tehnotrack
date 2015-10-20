@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -52,7 +53,7 @@ public class HistoryStore {
     }
 
     public void addHistory(String line) throws IOException {
-        listHistory.add(line);
+        listHistory.add(line + " " + Calendar.getInstance().getTime().toString());
         writeFileHistory();
     }
 
