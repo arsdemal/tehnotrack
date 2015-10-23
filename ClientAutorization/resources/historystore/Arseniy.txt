@@ -1,6 +1,0 @@
-sdf
-sdgdsg
-sdgsgsdgs
-\help
-\exit
-\history 4
