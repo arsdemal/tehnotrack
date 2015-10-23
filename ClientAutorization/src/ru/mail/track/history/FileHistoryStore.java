@@ -19,10 +19,7 @@ public class FileHistoryStore implements HistoryStore {
     private ArrayList<String> listHistory;
 
     final static Charset ENCODING = StandardCharsets.UTF_8;
-    private String FILE_USER_HISTORY_STORE; // = "C:\\Users\\Arsdemal\\Documents\\Projects\\JAVA\\" +
-           // "project2\\tehnotrack\\ClientAutorization\\resources\\historystore\\Arseniy.txt";;
-
-
+    private String FILE_USER_HISTORY_STORE;
 
     public FileHistoryStore() {
         listHistory = new ArrayList<String>();
@@ -93,13 +90,7 @@ public class FileHistoryStore implements HistoryStore {
     public void printHistory(int N) {
         System.out.println(N);
         int listHistorySize = listHistory.size();
-        int i;
-        if( listHistorySize - N < 0) {
-            i = 0;
-        } else {
-            i = listHistorySize - N;
-        }
-        for ( ; i < listHistorySize - 1; i++) {
+        for ( int i = (listHistorySize - N < 0) ? 0 : listHistorySize - N ; i < listHistorySize - 1; i++) {
             System.out.println(listHistory.get(i));
         }
     }

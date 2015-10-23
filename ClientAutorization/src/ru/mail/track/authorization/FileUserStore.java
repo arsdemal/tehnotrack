@@ -33,7 +33,7 @@ public class FileUserStore implements UserStore {
     private void readFile() throws IOException {
         Path path = Paths.get(FILE_USER_STORE);
         try (BufferedReader reader = Files.newBufferedReader(path, ENCODING)){
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(" ");
                 User user = new User(parts[0],parts[1]);
@@ -47,8 +47,7 @@ public class FileUserStore implements UserStore {
         try (BufferedWriter writer = Files.newBufferedWriter(path, ENCODING)){
             int userSize = users.size();
             for (int i = 0; i < userSize; i++){
-                String line = new String(users.get(i).getName()+" "+users.get(i).getPass());
-                writer.write(line);
+                writer.write(users.get(i).getName()+" "+users.get(i).getPass());
                 writer.newLine();
             }
         }

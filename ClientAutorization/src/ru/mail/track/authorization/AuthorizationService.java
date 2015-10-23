@@ -39,12 +39,10 @@ public class AuthorizationService {
             return null;
         } else {
             System.out.println("Create password");
-            //String password = scanner.next();
             User user = new User(name,scanner.next());
             userStore.addUser(user);
             return user;
         }
-
 
     }
 }
