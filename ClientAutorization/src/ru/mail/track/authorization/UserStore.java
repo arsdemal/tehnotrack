@@ -20,4 +20,6 @@ public interface UserStore {
 
     // ѕолучить пользовател€ по имени и паролю
     User getUser(String name, String pass);
+
+    Integer getLastId();
 }

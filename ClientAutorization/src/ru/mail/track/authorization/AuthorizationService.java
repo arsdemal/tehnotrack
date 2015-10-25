@@ -40,6 +40,7 @@ public class AuthorizationService {
         } else {
             System.out.println("Create password");
             User user = new User(name,scanner.next());
+            user.setId(userStore.getLastId());
             userStore.addUser(user);
             return user;
         }

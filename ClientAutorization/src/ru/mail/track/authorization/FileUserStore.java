@@ -20,15 +20,20 @@ public class FileUserStore implements UserStore {
     final static Charset ENCODING = StandardCharsets.UTF_8;
     final static String FILE_USER_STORE = "C:\\Users\\Arsdemal\\Documents\\Projects\\JAVA\\project2\\tehnotrack\\" +
             "ClientAutorization\\resources\\userstore.txt";
+    private Integer storeSize;
+
+    ArrayList<User> users = new ArrayList<>();
+
     public FileUserStore() {
         try {
             readFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        storeSize = users.size();
     }
 
-    ArrayList<User> users = new ArrayList<>();
+
 
     private void readFile() throws IOException {
         Path path = Paths.get(FILE_USER_STORE);
@@ -37,6 +42,7 @@ public class FileUserStore implements UserStore {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(" ");
                 User user = new User(parts[0],parts[1]);
+                user.setId(Integer.parseInt(parts[2]));
                 addUser(user);
             }
         }
@@ -47,7 +53,7 @@ public class FileUserStore implements UserStore {
         try (BufferedWriter writer = Files.newBufferedWriter(path, ENCODING)){
             int userSize = users.size();
             for (int i = 0; i < userSize; i++){
-                writer.write(users.get(i).getName()+" "+users.get(i).getPass());
+                writer.write(users.get(i).getName()+" "+users.get(i).getPass()+" "+users.get(i).getId());
                 writer.newLine();
             }
         }
@@ -81,5 +87,10 @@ public class FileUserStore implements UserStore {
             }
         }
         return null;
+    }
+
+    @Override
+    public Integer getLastId() {
+        return users.size();
     }
 }
