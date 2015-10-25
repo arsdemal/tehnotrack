@@ -19,7 +19,7 @@ public class FindCommand implements Command {
             if (args.length != 2) {
                 System.out.println("Incorrect");
             } else {
-                historyStore.setFileNameUser(session.getSessionUser().getName());
+                historyStore.setFileUserId(session.getSessionUser().getId());
                 historyStore.findHistory(args[1]);
             }
         }

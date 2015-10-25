@@ -1,7 +1,5 @@
 package ru.mail.track.history;
 
-import ru.mail.track.session.User;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,19 +24,21 @@ public class FileHistoryStore implements HistoryStore {
     }
 
     @Override
-    public void setFileNameUser(String name) throws IOException {
+    // эту функцию нужно выполнить один раз когда войдет юзер
+    public void setFileUserId(Integer id) throws IOException {
         FILE_USER_HISTORY_STORE = "C:\\Users\\Arsdemal\\Documents\\Projects\\JAVA\\" +
-            "project2\\tehnotrack\\ClientAutorization\\resources\\historystore\\" + name + ".txt";
-        readFileHistory();
+            "project2\\tehnotrack\\ClientAutorization\\resources\\historystore\\" + id + ".txt";
+        readFileUserId();
     }
 
-    private void readFileHistory() throws IOException {
+    private void readFileUserId() throws IOException {
 
+        listHistory.clear();
         File file = new File(FILE_USER_HISTORY_STORE);
         if (file.exists()) {
             Path path = Paths.get(FILE_USER_HISTORY_STORE);
             try (BufferedReader reader = Files.newBufferedReader(path, ENCODING)){
-                String line = null;
+                String line;
                 while ((line = reader.readLine()) != null) {
                     listHistory.add(line);
                 }

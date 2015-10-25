@@ -27,7 +27,7 @@ public class InputHandler {
     public void handle(String data) throws IOException {
 
         if(session.getSessionUser() != null) {
-            historyStore.setFileNameUser(session.getSessionUser().getName());
+            historyStore.setFileUserId(session.getSessionUser().getId());
             historyStore.addHistory(data);
         }
 

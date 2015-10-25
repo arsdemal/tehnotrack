@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public interface HistoryStore {
 
-    void setFileNameUser(String name) throws IOException;
+    void setFileUserId(Integer id) throws IOException;
 
     void addHistory(String str) throws IOException;
 

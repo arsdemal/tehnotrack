@@ -20,9 +20,9 @@ public class HistoryCommand implements Command {
             if ( args.length > 2) {
                 System.out.println("Incorrect");
             } else {
-                historyStore.setFileNameUser(session.getSessionUser().getName());
+                //historyStore.setFileUserId(session.getSessionUser().getId());
                 if( args.length == 2) {
-                    historyStore.printHistory(Integer.parseInt(args[1])); // может быть ошибка
+                    historyStore.printHistory(Integer.parseInt(args[1]));
                 } else {
                     historyStore.printHistory();
                 }
