@@ -93,4 +93,15 @@ public class FileUserStore implements UserStore {
     public Integer getLastId() {
         return users.size();
     }
+
+    @Override
+    public void ChangeNameUser(User user, String name) {
+        user.setName(name);
+        try {
+            writeFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

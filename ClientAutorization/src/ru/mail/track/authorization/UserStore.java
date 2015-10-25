@@ -22,4 +22,6 @@ public interface UserStore {
     User getUser(String name, String pass);
 
     Integer getLastId();
+
+    void ChangeNameUser(User user, String name);
 }

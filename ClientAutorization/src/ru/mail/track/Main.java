@@ -40,11 +40,13 @@ public class Main {
         Command helpCommand = new HelpCommand(commands);
         Command findCommand = new FindCommand(historyStore);
         Command historyCommand = new HistoryCommand(historyStore);
+        Command userCommand = new UserCommand(userStore);
 
         commands.put("\\login", loginCommand);
         commands.put("\\help", helpCommand);
         commands.put("\\find",findCommand);
         commands.put("\\history",historyCommand);
+        commands.put("\\user",userCommand);
 
         InputHandler handler = new InputHandler(session, commands, historyStore);
 
