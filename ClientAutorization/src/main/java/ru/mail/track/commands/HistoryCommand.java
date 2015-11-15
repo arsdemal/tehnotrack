@@ -1,6 +1,7 @@
 package ru.mail.track.commands;
 
 import ru.mail.track.history.HistoryStore;
+import ru.mail.track.message.Message;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
@@ -13,8 +14,9 @@ public class HistoryCommand implements Command {
     public HistoryCommand(HistoryStore historyStore) { this.historyStore = historyStore; }
 
     @Override
-    public void execute(Session session, String[] args) throws IOException {
-        if ( session.getSessionUser() == null) {
+    public void execute(Session session, Message message) throws IOException {
+
+        /*if ( session.getSessionUser() == null) {
             System.out.println("You don't login");
         } else {
             if ( args.length > 2) {
@@ -27,6 +29,6 @@ public class HistoryCommand implements Command {
                     historyStore.printHistory();
                 }
             }
-        }
+        }*/
     }
 }

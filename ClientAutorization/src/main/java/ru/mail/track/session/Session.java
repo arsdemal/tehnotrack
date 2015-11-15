@@ -1,14 +1,39 @@
 package ru.mail.track.session;
 
+import ru.mail.track.message.User;
+import ru.mail.track.net.ConnectionHandler;
+
 /**
- * Класс содержит информацию о текущей сессии взаимодействия
- * Пока нам остаточно хранить юзера, возможно понадобится еще какое-то состояние
+ * РљР»Р°СЃСЃ СЃРѕРґРµСЂР¶РёС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ С‚РµРєСѓС‰РµР№ СЃРµСЃСЃРёРё РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ
+ * РџРѕРєР° РЅР°Рј РѕСЃС‚Р°С‚РѕС‡РЅРѕ С…СЂР°РЅРёС‚СЊ СЋР·РµСЂР°, РІРѕР·РјРѕР¶РЅРѕ РїРѕРЅР°РґРѕР±РёС‚СЃСЏ РµС‰Рµ РєР°РєРѕРµ-С‚Рѕ СЃРѕСЃС‚РѕСЏРЅРёРµ
  */
 public class Session {
 
+    private Long id;
     private User sessionUser;
+    private ConnectionHandler connectionHandler;
 
     public Session() {
+    }
+
+    public ConnectionHandler getConnectionHandler() {
+        return connectionHandler;
+    }
+
+    public void setConnectionHandler(ConnectionHandler connectionHandler) {
+        this.connectionHandler = connectionHandler;
+    }
+
+    public Session(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public User getSessionUser() {
@@ -17,5 +42,14 @@ public class Session {
 
     public void setSessionUser(User sessionUser) {
         this.sessionUser = sessionUser;
+    }
+
+    @Override
+    public String toString() {
+        return "Session{" +
+                "id=" + id +
+                ", sessionUser=" + sessionUser +
+                ", connectionHandler=" + connectionHandler +
+                '}';
     }
 }

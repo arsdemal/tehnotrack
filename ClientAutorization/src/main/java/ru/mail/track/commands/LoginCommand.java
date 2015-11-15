@@ -1,24 +1,28 @@
 package ru.mail.track.commands;
 
-import ru.mail.track.authorization.AuthorizationService;
+import ru.mail.track.message.UserStore;
+import ru.mail.track.message.Message;
+import ru.mail.track.net.SessionManager;
 import ru.mail.track.session.Session;
 
-/**
- * Выполняем авторизацию по этой команде
- */
 public class LoginCommand implements Command {
 
-    private AuthorizationService service;
+    //private AuthorizationService service;
+    private SessionManager sessionManager;
+    private UserStore userStore;
 
-    public LoginCommand(AuthorizationService service) {
-        this.service = service;
+    public LoginCommand(UserStore userStore,SessionManager sessionManager ) {
+        this.sessionManager = sessionManager;
+        this.userStore = userStore;
     }
 
     @Override
-    public void execute(Session session, String[] args) {
-        System.out.println("Executing login");
+    public void execute(Session session, Message message) {
+
+
+        /*System.out.println("Executing login");
         if (session.getSessionUser() != null) {
-                System.out.println("Вы уже вошли");
+                System.out.println("пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
         } else {
             if (args.length == 3) {
                 session.setSessionUser(service.login(args[1], args[2]));
@@ -30,6 +34,6 @@ public class LoginCommand implements Command {
                 }
             }
 
-        }
+        }*/
     }
 }

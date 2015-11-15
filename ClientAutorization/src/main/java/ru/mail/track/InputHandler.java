@@ -1,13 +1,11 @@
 package ru.mail.track;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import ru.mail.track.commands.Command;
 import ru.mail.track.history.HistoryStore;
 import ru.mail.track.session.Session;
+
+import java.io.IOException;
+import java.util.Map;
 
 
 public class InputHandler {
@@ -26,17 +24,17 @@ public class InputHandler {
 
     public void handle(String data) throws IOException {
 
-        if(session.getSessionUser() != null) {
+        /*if(session.getSessionUser() != null) {
             historyStore.setFileUserId(session.getSessionUser().getId());
             historyStore.addHistory(data);
-        }
+        }*/
 
         if (data.startsWith("\\")) {
 
             String[] tokens = data.split(" ");
             if (commandMap.containsKey(tokens[0])) {
                 Command cmd = commandMap.get(tokens[0]);
-                cmd.execute(session, tokens);
+                //cmd.execute(session, tokens);
             }
 
         } else {
