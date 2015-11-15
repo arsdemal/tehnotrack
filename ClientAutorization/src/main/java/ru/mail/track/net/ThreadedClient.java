@@ -41,6 +41,7 @@ public class ThreadedClient implements MessageListener {
 
             handler.addListener(this);
 
+            // запускаем поток handler
             Thread socketHandler = new Thread(handler);
             socketHandler.start();
         } catch (IOException e) {
@@ -54,6 +55,9 @@ public class ThreadedClient implements MessageListener {
         Protocol protocol = new StringProtocol();
         ThreadedClient client = new ThreadedClient();
 
+        client.init(); // включили клиент
+
+        // вводим иформацию в консоль
         Scanner scanner = new Scanner(System.in);
         System.out.println("$");
         while (true) {
@@ -69,12 +73,17 @@ public class ThreadedClient implements MessageListener {
         String[] tokens = line.split(" ");
         log.info("Tokens: {}", Arrays.toString(tokens));
         String cmdType = tokens[0];
+
+        //обрабатываем информацию с консоли
         switch (cmdType) {
             case "login":
+                //создаем LoginMessage и отдаем хендлеру
                 LoginMessage loginMessage = new LoginMessage();
                 loginMessage.setType(CommandType.USER_LOGIN);
-                loginMessage.setLogin(tokens[1]);
-                loginMessage.setPass(tokens[2]);
+                if ( tokens.length == 3) {
+                    loginMessage.setLogin(tokens[1]);
+                    loginMessage.setPass(tokens[2]);
+                }
                 handler.send(loginMessage);
                 break;
             case "send":
@@ -92,10 +101,6 @@ public class ThreadedClient implements MessageListener {
 
     }
 
-    /**
-     * �������� ��������� �� handler, ��� ������������
-     *
-     */
     @Override
     public void onMessage(Session session, Message msg) {
         System.out.printf("%s", ((SendMessage) msg).getMessage());
