@@ -2,6 +2,7 @@ package ru.mail.track.message;
 
 import java.util.HashMap;
 import java.util.Map;
+//import ru.mail.track.message.UserStore;
 
 /**
  *
@@ -48,5 +49,15 @@ public class UserStoreStub implements UserStore {
     @Override
     public User getUserById(Long id) {
         return null;
+    }
+
+    @Override
+    public boolean isUserExist(String name) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

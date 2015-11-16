@@ -1,11 +1,15 @@
 package ru.mail.track.authorization;
 
 
-import ru.mail.track.session.User;
-
-import java.util.Scanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.mail.track.message.LoginMessage;
+import ru.mail.track.message.User;
+import ru.mail.track.message.UserStore;
 
 public class AuthorizationService {
+
+    static Logger log = LoggerFactory.getLogger(AuthorizationService.class);
 
     private UserStore userStore;
 
@@ -13,34 +17,13 @@ public class AuthorizationService {
         this.userStore = userStore;
     }
 
-    public User login(String name, String password) {
-
-        User user;
-        if (!userStore.isUserExist(name)){
-            System.out.println("A user with this name no exist");
+    public User createUser(LoginMessage loginMessage) {
+        if (userStore.isUserExist(loginMessage.getLogin())) {
+            log.info("A user with that username already exists");
             return null;
         } else {
-            if ( (user = userStore.getUser(name,password)) == null) {
-                System.out.println("Incorrect password");
-                return null;
-            } else {
-                return user;
-            }
-        }
-    }
-
-    public User createUser() {
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your user name");
-        String name = scanner.next();
-        if (userStore.isUserExist(name)) {
-            System.out.println("A user with that username already exists");
-            return null;
-        } else {
-            System.out.println("Create password");
-            User user = new User(name,scanner.next());
-            user.setId(userStore.getLastId());
+            log.info("Create password");
+            User user = new User(loginMessage.getLogin(), loginMessage.getPass());
             userStore.addUser(user);
             return user;
         }

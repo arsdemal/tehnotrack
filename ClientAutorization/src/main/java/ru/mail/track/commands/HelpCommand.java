@@ -18,6 +18,6 @@ public class HelpCommand implements Command {
 
     @Override
     public void execute(Session session, Message message) {
-        System.out.println("Executing help");
+
     }
 }

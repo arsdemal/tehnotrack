@@ -1,7 +1,7 @@
 package ru.mail.track.commands;
 
-import ru.mail.track.authorization.UserStore;
 import ru.mail.track.message.Message;
+import ru.mail.track.message.UserStore;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;

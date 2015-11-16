@@ -3,6 +3,7 @@ package ru.mail.track.net;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.track.commands.CommandType;
+import ru.mail.track.message.HelpMessage;
 import ru.mail.track.message.LoginMessage;
 import ru.mail.track.message.Message;
 import ru.mail.track.message.SendMessage;
@@ -92,6 +93,11 @@ public class ThreadedClient implements MessageListener {
                 sendMessage.setChatId(Long.valueOf(tokens[1]));
                 sendMessage.setMessage(tokens[2]);
                 handler.send(sendMessage);
+                break;
+            case "help":
+                HelpMessage helpMessage = new HelpMessage();
+                helpMessage.setType(CommandType.USER_HELP);
+                handler.send(helpMessage);
                 break;
             default:
                 System.out.println("Invalid input: " + line);

@@ -1,5 +1,10 @@
 package ru.mail.track.net;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.mail.track.message.Message;
+import ru.mail.track.session.Session;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,12 +12,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ru.mail.track.message.Message;
-import ru.mail.track.session.Session;
 
 /**
  * Класс работающий с сокетом, умеет отправлять данные в сокет
@@ -47,6 +46,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
 
         // TODO: здесь должен быть встроен алгоритм кодирования/декодирования сообщений
         // то есть требуется описать протокол
+
         out.write(protocol.encode(msg));
         out.flush();
     }
@@ -73,7 +73,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
                     Message msg = protocol.decode(Arrays.copyOf(buf, read));
                     msg.setSender(session.getId());
                     log.info("message received: {}", msg);
-                    // Уведомим всех подписчиков этого события
+                    // Уведомим всех подписчиков этого события (хендлеру команд)
                     notifyListeners(session, msg);
                 }
             } catch (Exception e) {
