@@ -20,6 +20,7 @@ public class Session {
         return connectionHandler;
     }
 
+    // связываем сессию и сокет
     public void setConnectionHandler(ConnectionHandler connectionHandler) {
         this.connectionHandler = connectionHandler;
     }

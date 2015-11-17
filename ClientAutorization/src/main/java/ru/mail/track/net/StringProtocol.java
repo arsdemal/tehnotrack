@@ -3,9 +3,7 @@ package ru.mail.track.net;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.track.commands.CommandType;
-import ru.mail.track.message.LoginMessage;
-import ru.mail.track.message.Message;
-import ru.mail.track.message.SendMessage;
+import ru.mail.track.message.*;
 
 /**
  *
@@ -34,6 +32,13 @@ public class StringProtocol implements Protocol {
                 sendMessage.setChatId(Long.valueOf(tokens[1]));
                 sendMessage.setMessage(tokens[2]);
                 return sendMessage;
+            case USER_HELP:
+                HelpMessage helpMessage = new HelpMessage();
+                return helpMessage;
+            case MSG_INFO:
+                InfoMessage infoMessage = new InfoMessage();
+                infoMessage.setInfo(tokens[1]);
+                return infoMessage;
             default:
                 throw new RuntimeException("Invalid type: " + type);
         }
@@ -54,6 +59,12 @@ public class StringProtocol implements Protocol {
                 SendMessage sendMessage = (SendMessage) msg;
                 builder.append(sendMessage.getChatId()).append(DELIMITER);
                 builder.append(sendMessage.getMessage()).append(DELIMITER);
+                break;
+            case USER_HELP:
+                break;
+            case MSG_INFO:
+                InfoMessage infoMessage = (InfoMessage) msg;
+                builder.append(infoMessage.getInfo()).append(DELIMITER);
                 break;
             default:
                 throw new RuntimeException("Invalid type: " + type);

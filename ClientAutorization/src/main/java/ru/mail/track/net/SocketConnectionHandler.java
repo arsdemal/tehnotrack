@@ -44,9 +44,6 @@ public class SocketConnectionHandler implements ConnectionHandler {
             log.debug(msg.toString());
         }
 
-        // TODO: здесь должен быть встроен алгоритм кодирования/декодирования сообщений
-        // то есть требуется описать протокол
-
         out.write(protocol.encode(msg));
         out.flush();
     }
@@ -73,7 +70,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
                     Message msg = protocol.decode(Arrays.copyOf(buf, read));
                     msg.setSender(session.getId());
                     log.info("message received: {}", msg);
-                    // Уведомим всех подписчиков этого события (хендлеру команд)
+                    // Уведомим всех подписчиков этого события (сервер - хендлеру команд, клиент - клиенту)
                     notifyListeners(session, msg);
                 }
             } catch (Exception e) {

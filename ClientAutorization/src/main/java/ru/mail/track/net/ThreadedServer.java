@@ -76,7 +76,7 @@ public class ThreadedServer {
             log.info("Accepted. " + socket.getInetAddress());
             //создаем хендлер для связи с сервером
             ConnectionHandler handler = new SocketConnectionHandler(protocol, sessionManager.createSession(), socket);
-            //добовляем хендлер команд, перехватывающий сообщения от хендлера связи
+            //добавляем хендлер команд, перехватывающий сообщения от хендлера связи
             handler.addListener(commandHandler);
 
             handlers.put(internalCounter.incrementAndGet(), handler);

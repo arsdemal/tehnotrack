@@ -17,9 +17,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 
-/**
- * ���������� �����
- */
 public class ThreadedClient implements MessageListener {
 
     public static final int PORT = 19000;
@@ -38,11 +35,12 @@ public class ThreadedClient implements MessageListener {
         try {
             Socket socket = new Socket(HOST, PORT);
             Session session = new Session();
+            // создаем хендлер для перехвата и отправки собщений для клиента
             handler = new SocketConnectionHandler(protocol, session, socket);
-
+            // слушаем наш хендлер
             handler.addListener(this);
 
-            // запускаем поток handler
+            // запускаем новый поток хендлер
             Thread socketHandler = new Thread(handler);
             socketHandler.start();
         } catch (IOException e) {
@@ -97,13 +95,11 @@ public class ThreadedClient implements MessageListener {
             case "help":
                 HelpMessage helpMessage = new HelpMessage();
                 helpMessage.setType(CommandType.USER_HELP);
-                handler.send(helpMessage);
+                 handler.send(helpMessage);
                 break;
             default:
                 System.out.println("Invalid input: " + line);
         }
-
-
 
     }
 

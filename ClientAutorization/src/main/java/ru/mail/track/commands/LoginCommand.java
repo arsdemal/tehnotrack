@@ -48,10 +48,13 @@ public class LoginCommand implements Command {
                     log.info("Incorrect data");
                 }
             }
-
-            session.setSessionUser(user);
-            sessionManager.registerUser(user.getId(), session.getId());
-            log.info("Success login: {}", user);
+            if (user != null) {
+                session.setSessionUser(user);
+                sessionManager.registerUser(user.getId(), session.getId());
+                log.info("Success login: {}", user);
+            } else {
+                log.info("No success login");
+            }
         }
 
     }
