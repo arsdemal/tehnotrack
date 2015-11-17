@@ -1,5 +1,7 @@
 package ru.mail.track.message;
-
+/**
+ *  Информирующее сообщение от клиента
+ */
 import ru.mail.track.commands.CommandType;
 
 public class InfoMessage extends Message {

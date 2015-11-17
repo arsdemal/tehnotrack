@@ -70,7 +70,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
                     Message msg = protocol.decode(Arrays.copyOf(buf, read));
                     msg.setSender(session.getId());
                     log.info("message received: {}", msg);
-                    // Уведомим всех подписчиков этого события (сервер - хендлеру команд, клиент - клиенту)
+                    // Уведомим всех подписчиков этого события (сервер - commandHandler, клиент - inputHandler)
                     notifyListeners(session, msg);
                 }
             } catch (Exception e) {

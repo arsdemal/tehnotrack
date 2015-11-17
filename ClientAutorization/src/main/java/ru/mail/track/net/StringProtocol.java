@@ -39,6 +39,9 @@ public class StringProtocol implements Protocol {
                 InfoMessage infoMessage = new InfoMessage();
                 infoMessage.setInfo(tokens[1]);
                 return infoMessage;
+            case CHAT_LIST:
+                ChatListMessage chatListMessage = new ChatListMessage();
+                return chatListMessage;
             default:
                 throw new RuntimeException("Invalid type: " + type);
         }
@@ -65,6 +68,8 @@ public class StringProtocol implements Protocol {
             case MSG_INFO:
                 InfoMessage infoMessage = (InfoMessage) msg;
                 builder.append(infoMessage.getInfo()).append(DELIMITER);
+                break;
+            case CHAT_LIST:
                 break;
             default:
                 throw new RuntimeException("Invalid type: " + type);

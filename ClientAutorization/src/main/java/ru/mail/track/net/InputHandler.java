@@ -65,6 +65,11 @@ public class InputHandler implements MessageListener {
                 helpMessage.setType(CommandType.USER_HELP);
                 session.getConnectionHandler().send(helpMessage);
                 break;
+            case "chat_list":
+                ChatListMessage chatListMessage = new ChatListMessage();
+                chatListMessage.setType(CommandType.CHAT_LIST);
+                session.getConnectionHandler().send(chatListMessage);
+                break;
             default:
                 System.out.println("Invalid input: " + line);
         }

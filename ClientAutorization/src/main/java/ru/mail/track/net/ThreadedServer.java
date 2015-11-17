@@ -55,6 +55,7 @@ public class ThreadedServer {
         cmds.put(CommandType.USER_LOGIN, new LoginCommand(userStore, sessionManager));
         cmds.put(CommandType.MSG_SEND, new SendCommand(sessionManager, messageStore));
         cmds.put(CommandType.USER_HELP, new HelpCommand(cmds));
+        cmds.put(CommandType.CHAT_LIST, new ChatListCommand(messageStore));
         CommandHandler handler = new CommandHandler(cmds);
 
 

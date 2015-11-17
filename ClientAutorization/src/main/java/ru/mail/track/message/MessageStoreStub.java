@@ -1,10 +1,6 @@
 package ru.mail.track.message;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -35,10 +31,12 @@ public class MessageStoreStub implements MessageStore {
 
     static {
         Chat chat1 = new Chat();
+        chat1.setId(counter.incrementAndGet());
         chat1.addParticipant(0L);
         chat1.addParticipant(2L);
 
         Chat chat2 = new Chat();
+        chat2.setId(counter.incrementAndGet());
         chat2.addParticipant(1L);
         chat2.addParticipant(2L);
         chat2.addParticipant(3L);
@@ -49,7 +47,13 @@ public class MessageStoreStub implements MessageStore {
 
     @Override
     public List<Long> getChatsByUserId(Long userId) {
-        return null;
+        List<Long> chatsId = new ArrayList();
+        for (Long key: chats.keySet()) {
+            if (chats.get(key).getParticipantIds().contains(userId)) {
+                chatsId.add(chats.get(key).getId());
+            }
+        }
+        return chatsId;
     }
 
     @Override

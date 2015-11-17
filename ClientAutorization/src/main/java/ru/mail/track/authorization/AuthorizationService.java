@@ -27,6 +27,5 @@ public class AuthorizationService {
             userStore.addUser(user);
             return user;
         }
-
     }
 }

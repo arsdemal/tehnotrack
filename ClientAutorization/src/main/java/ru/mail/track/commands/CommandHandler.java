@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * получает сообщение от connectionHandler
+ * выполняет его
  *
  */
 public class CommandHandler implements MessageListener {
