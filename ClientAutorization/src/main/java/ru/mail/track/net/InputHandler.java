@@ -70,6 +70,24 @@ public class InputHandler implements MessageListener {
                 chatListMessage.setType(CommandType.CHAT_LIST);
                 session.getConnectionHandler().send(chatListMessage);
                 break;
+            case "user":
+                UserMessage userMessage = new UserMessage();
+                userMessage.setType(CommandType.USER_NICK);
+                userMessage.setUserName(tokens[1]);
+                session.getConnectionHandler().send(userMessage);
+                break;
+            case "user_info":
+                UserInfoMessage infoMsg = new UserInfoMessage();
+                infoMsg.setType(CommandType.USER_INF0);
+                session.getConnectionHandler().send(infoMsg);
+                break;
+            case "user_pass":
+                UserPassMessage passMsg = new UserPassMessage();
+                passMsg.setType(CommandType.USER_PASS);
+                passMsg.setOldPass(tokens[1]);
+                passMsg.setNewPass(tokens[2]);
+                session.getConnectionHandler().send(passMsg);
+                break;
             default:
                 System.out.println("Invalid input: " + line);
         }

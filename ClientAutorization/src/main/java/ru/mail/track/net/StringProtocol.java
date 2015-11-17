@@ -33,15 +33,24 @@ public class StringProtocol implements Protocol {
                 sendMessage.setMessage(tokens[2]);
                 return sendMessage;
             case USER_HELP:
-                HelpMessage helpMessage = new HelpMessage();
-                return helpMessage;
+                return new HelpMessage();
             case MSG_INFO:
                 InfoMessage infoMessage = new InfoMessage();
                 infoMessage.setInfo(tokens[1]);
                 return infoMessage;
             case CHAT_LIST:
-                ChatListMessage chatListMessage = new ChatListMessage();
-                return chatListMessage;
+                return new ChatListMessage();
+            case USER_NICK:
+                UserMessage userMessage = new UserMessage();
+                userMessage.setUserName(tokens[1]);
+                return userMessage;
+            case USER_INF0:
+                return new UserInfoMessage();
+            case USER_PASS:
+                UserPassMessage passMsg = new UserPassMessage();
+                passMsg.setOldPass(tokens[1]);
+                passMsg.setNewPass(tokens[2]);
+                return passMsg;
             default:
                 throw new RuntimeException("Invalid type: " + type);
         }
@@ -70,6 +79,17 @@ public class StringProtocol implements Protocol {
                 builder.append(infoMessage.getInfo()).append(DELIMITER);
                 break;
             case CHAT_LIST:
+                break;
+            case USER_NICK:
+                UserMessage userMessage = (UserMessage) msg;
+                builder.append(userMessage.getUserName()).append(DELIMITER);
+                break;
+            case USER_INF0:
+                break;
+            case USER_PASS:
+                UserPassMessage userPassMessage = (UserPassMessage) msg;
+                builder.append(userPassMessage.getOldPass()).append(DELIMITER);
+                builder.append(userPassMessage.getNewPass()).append(DELIMITER);
                 break;
             default:
                 throw new RuntimeException("Invalid type: " + type);

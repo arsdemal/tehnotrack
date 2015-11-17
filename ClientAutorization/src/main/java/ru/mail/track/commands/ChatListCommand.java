@@ -27,7 +27,7 @@ public class ChatListCommand implements ChatCommand {
     public void execute(Session session, Message message) throws IOException {
         if (session.getSessionUser() == null) {
             InfoMessage info = new InfoMessage();
-            info.setType(CommandType.MSG_INFO); 
+            info.setType(CommandType.MSG_INFO);
             info.setInfo("No login");
             session.getConnectionHandler().send(info);
         } else {
