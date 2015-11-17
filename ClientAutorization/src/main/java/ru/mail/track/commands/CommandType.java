@@ -12,5 +12,7 @@ public enum CommandType {
     MSG_SEND,
     MSG_INFO,
     CHAT_LIST,
-
+    CHAT_CREATE,
+    CHAT_FIND,
+    CHAT_HISTORY,
 }

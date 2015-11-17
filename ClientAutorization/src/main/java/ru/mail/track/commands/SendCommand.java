@@ -1,9 +1,6 @@
 package ru.mail.track.commands;
 
-import ru.mail.track.message.Chat;
-import ru.mail.track.message.Message;
-import ru.mail.track.message.MessageStore;
-import ru.mail.track.message.SendMessage;
+import ru.mail.track.message.*;
 import ru.mail.track.net.SessionManager;
 import ru.mail.track.session.Session;
 
@@ -26,18 +23,32 @@ public class SendCommand implements Command {
     @Override
     public void execute(Session session, Message message) {
 
-        SendMessage sendMessage = (SendMessage) message;
-        Chat chat = messageStore.getChatById(sendMessage.getChatId());
-        List<Long> parts = chat.getParticipantIds();
-        try {
-            for (Long userId : parts) {
-                Session userSession = sessionManager.getSessionByUser(userId);
-                if (userSession != null) {
-                    userSession.getConnectionHandler().send(message);
-                }
+        InfoMessage infoMsg = new InfoMessage();
+        infoMsg.setType(CommandType.MSG_INFO);
+
+        if (session.getSessionUser() == null) {
+            infoMsg.setInfo("You are not logged in");
+            try {
+                session.getConnectionHandler().send(infoMsg);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            SendMessage sendMessage = (SendMessage) message;
+            Chat chat = messageStore.getChatById(sendMessage.getChatId());
+            List<Long> parts = chat.getParticipantIds();
+            try {
+                for (Long userId : parts) {
+                    Session userSession = sessionManager.getSessionByUser(userId);
+                    if (userSession != null) {
+                        userSession.getConnectionHandler().send(message);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
+
     }
 }

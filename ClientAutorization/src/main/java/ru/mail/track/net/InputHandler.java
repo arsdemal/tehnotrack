@@ -25,6 +25,7 @@ public class InputHandler implements MessageListener {
     @Override
     public void onMessage(Session session, Message message) {
         CommandType type = message.getType();
+
         log.info("onMessage: {} type {}", message, type);
         switch (type) {
             case MSG_INFO:
@@ -32,6 +33,8 @@ public class InputHandler implements MessageListener {
                 log.info(infoMsg.getInfo());
                 break;
             case MSG_SEND:
+                SendMessage sendMsg = (SendMessage) message;
+                System.out.println(sendMsg.getMessage());
                 break;
         }
     }

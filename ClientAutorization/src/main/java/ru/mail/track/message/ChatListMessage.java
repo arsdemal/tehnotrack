@@ -10,4 +10,5 @@ public class ChatListMessage extends Message {
     public ChatListMessage() {
         setType(CommandType.CHAT_LIST);
     }
+
 }

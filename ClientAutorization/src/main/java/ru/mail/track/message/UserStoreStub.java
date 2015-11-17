@@ -32,8 +32,7 @@ public class UserStoreStub implements UserStore {
 
     @Override
     public User addUser(User user) {
-        User item = users.put(user.getId(), user);
-        return item;
+        return users.put(user.getId(), user);
     }
 
     @Override
