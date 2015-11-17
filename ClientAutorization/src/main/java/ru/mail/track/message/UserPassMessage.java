@@ -29,8 +29,13 @@ public class UserPassMessage extends Message{
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
-        return false;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserPassMessage that = (UserPassMessage) o;
+
+        if (userOldPass != null ? !userOldPass.equals(that.userOldPass) : that.userOldPass != null) return false;
+        return !(userNewPass != null ? !userNewPass.equals(that.userNewPass) : that.userNewPass != null);
+
     }
 }
