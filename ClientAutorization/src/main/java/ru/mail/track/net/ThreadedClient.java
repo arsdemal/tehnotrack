@@ -21,7 +21,7 @@ public class ThreadedClient {
     InputHandler inputHandler;
 
     //@Auto(isRequired = true)
-    private Protocol protocol = new StringProtocol();
+    private Protocol protocol = new SerializeProtocol();
 
     public ThreadedClient() {
     }

@@ -45,7 +45,7 @@ public class ThreadedServer {
     }
 
     public static void main(String[] args) {
-        Protocol protocol = new StringProtocol();
+        Protocol protocol = new SerializeProtocol();
         SessionManager sessionManager = new SessionManager();
 
         UserStore userStore = new UserStoreStub();
