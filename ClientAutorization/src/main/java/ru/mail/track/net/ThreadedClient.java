@@ -2,27 +2,23 @@ package ru.mail.track.net;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mail.track.commands.CommandType;
-import ru.mail.track.message.HelpMessage;
-import ru.mail.track.message.LoginMessage;
-import ru.mail.track.message.Message;
-import ru.mail.track.message.SendMessage;
-//import ru.mail.track.reflection.di.Auto;
 import ru.mail.track.session.Session;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Scanner;
 
+//import ru.mail.track.reflection.di.Auto;
 
-public class ThreadedClient implements MessageListener {
+
+public class ThreadedClient {
 
     public static final int PORT = 19000;
     public static final String HOST = "localhost";
     static Logger log = LoggerFactory.getLogger(ThreadedClient.class);
     ConnectionHandler handler;
+    InputHandler inputHandler;
 
     //@Auto(isRequired = true)
     private Protocol protocol = new StringProtocol();
@@ -35,10 +31,11 @@ public class ThreadedClient implements MessageListener {
         try {
             Socket socket = new Socket(HOST, PORT);
             Session session = new Session();
-            // создаем хендлер для перехвата и отправки собщений для клиента
+            // создаем хендлер для перехвата и отправки собщений для inputHandler
             handler = new SocketConnectionHandler(protocol, session, socket);
+            inputHandler = new InputHandler(session);
             // слушаем наш хендлер
-            handler.addListener(this);
+            handler.addListener(inputHandler);
 
             // запускаем новый поток хендлер
             Thread socketHandler = new Thread(handler);
@@ -64,48 +61,9 @@ public class ThreadedClient implements MessageListener {
             if ("q".equals(input)) {
                 return;
             }
-            client.processInput(input);
+            client.inputHandler.processInput(input);
         }
     }
 
-    public void processInput(String line) throws IOException {
-        String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
-        String cmdType = tokens[0];
-
-        //обрабатываем информацию с консоли
-        switch (cmdType) {
-            case "login":
-                //создаем LoginMessage и отдаем хендлеру
-                LoginMessage loginMessage = new LoginMessage();
-                loginMessage.setType(CommandType.USER_LOGIN);
-                if ( tokens.length == 3) {
-                    loginMessage.setLogin(tokens[1]);
-                    loginMessage.setPass(tokens[2]);
-                }
-                handler.send(loginMessage);
-                break;
-            case "send":
-                SendMessage sendMessage = new SendMessage();
-                sendMessage.setType(CommandType.MSG_SEND);
-                sendMessage.setChatId(Long.valueOf(tokens[1]));
-                sendMessage.setMessage(tokens[2]);
-                handler.send(sendMessage);
-                break;
-            case "help":
-                HelpMessage helpMessage = new HelpMessage();
-                helpMessage.setType(CommandType.USER_HELP);
-                 handler.send(helpMessage);
-                break;
-            default:
-                System.out.println("Invalid input: " + line);
-        }
-
-    }
-
-    @Override
-    public void onMessage(Session session, Message msg) {
-        System.out.printf("%s", ((SendMessage) msg).getMessage());
-    }
 
 }
