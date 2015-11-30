@@ -8,15 +8,19 @@ import java.util.List;
 /**
  *
  */
-public class ChateCreateMessage extends Message {
+public class ChatCreateMessage extends Message {
 
     List<Long> usersId = new ArrayList<Long>();
 
-    public ChateCreateMessage() {
+    public ChatCreateMessage() {
         setType(CommandType.CHAT_CREATE);
     }
 
-    public void chateAddUSer(Long id) {
-        usersId.add(id);
+    public void setUsersId(List<Long> usersId) {
+        this.usersId = usersId;
+    }
+
+    public List<Long> getUsersId() {
+        return usersId;
     }
 }

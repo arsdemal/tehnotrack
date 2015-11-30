@@ -7,7 +7,9 @@ import ru.mail.track.message.*;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -37,9 +39,6 @@ public class InputHandler implements MessageListener {
                 SendMessage sendMsg = (SendMessage) message;
                 System.out.println(sendMsg.getMessage());
                 break;
-            // принимаем сообщение о регистрации, вводим данные, затем повторно отправляем на сервер
-            case USER_REG:
-                break;
         }
     }
 
@@ -51,7 +50,6 @@ public class InputHandler implements MessageListener {
         //обрабатываем информацию с консоли
         switch (cmdType) {
             case "login":
-                //создаем LoginMessage и отдаем хендлеру
                 if (tokens.length == 3) { // логинимся
                     LoginMessage loginMessage = new LoginMessage();
                     loginMessage.setType(CommandType.USER_LOGIN);
@@ -59,17 +57,21 @@ public class InputHandler implements MessageListener {
                     loginMessage.setPass(tokens[2]);
                     session.getConnectionHandler().send(loginMessage);
                 } else { // регистрируемся
+
                     log.info("Enter your login password");
+
                     RegisterMessage regMsg = new RegisterMessage();
                     regMsg.setType(CommandType.USER_REG);
+
                     Scanner scanner = new Scanner(System.in);
                     String[] regTokens = scanner.nextLine().split(" ");
+
                     if ( regTokens.length != 2) {
                         log.info("Incorrect data");
                     } else {
-                        regMsg.setLogin(regTokens[0]);
-                        regMsg.setPass(regTokens[1]);
                         try {
+                            regMsg.setLogin(regTokens[0]);
+                            regMsg.setPass(regTokens[1]);
                             session.getConnectionHandler().send(regMsg);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -111,6 +113,16 @@ public class InputHandler implements MessageListener {
                 passMsg.setOldPass(tokens[1]);
                 passMsg.setNewPass(tokens[2]);
                 session.getConnectionHandler().send(passMsg);
+                break;
+            case "chat_create":
+                ChatCreateMessage chatCreateMsg = new ChatCreateMessage();
+                chatCreateMsg.setType(CommandType.CHAT_CREATE);
+                List<Long> usersId = new ArrayList<>();
+                for (int i = 1; i < tokens.length; i++) {
+                    usersId.add(Long.parseLong(tokens[i]));
+                }
+                chatCreateMsg.setUsersId(usersId);
+                session.getConnectionHandler().send(chatCreateMsg);
                 break;
             default:
                 System.out.println("Invalid input: " + line);

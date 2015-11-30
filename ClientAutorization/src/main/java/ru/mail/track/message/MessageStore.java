@@ -38,5 +38,16 @@ public interface MessageStore {
      */
     void addUserToChat(Long userId, Long chatId);
 
+    /**
+     * Создать новый чат
+     */
+
+    void createChat(List<Long> usersId);
+
+    /**
+     *  Проверить существует ли такой чат
+     */
+
+    boolean isChatExist(List<Long> usersId);
 
 }

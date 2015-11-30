@@ -9,10 +9,7 @@ import ru.mail.track.session.Session;
 import java.io.IOException;
 
 /**
- *  1) логинимся если приходит полное сообщение
- *  2) отправляем сообщение RegisterMessage если сообщение не полное,
- *      клиент принимает сообщение, вводит данные, переотправляет сообщение
- *      на сервер
+ *  логинимся если приходит полное сообщение
  */
 public class LoginCommand implements Command {
 

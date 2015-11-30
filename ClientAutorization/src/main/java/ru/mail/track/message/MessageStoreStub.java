@@ -82,4 +82,25 @@ public class MessageStoreStub implements MessageStore {
     public void addUserToChat(Long userId, Long chatId) {
 
     }
+
+    @Override
+    public void createChat(List<Long> usersId) {
+
+        Chat newChat = new Chat();
+        newChat.setId(counter.incrementAndGet());
+        newChat.setParticipantIds(usersId);
+        chats.put(newChat.getId(),newChat);
+    }
+
+    @Override
+    public boolean isChatExist(List<Long> usersId) {
+
+        for (Chat chat : chats.values()) {
+            List<Long> usersChat = chat.getParticipantIds();
+            if (usersChat.equals(usersId)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
