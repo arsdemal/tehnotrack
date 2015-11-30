@@ -59,6 +59,7 @@ public class ThreadedServer {
         cmds.put(CommandType.USER_NICK, new UserCommand(userStore));
         cmds.put(CommandType.USER_INF0, new UserInfoCommand());
         cmds.put(CommandType.USER_PASS, new UserPassCommand());
+        cmds.put(CommandType.USER_REG, new RegisterCommand(userStore,sessionManager));
         CommandHandler handler = new CommandHandler(cmds);
 
 

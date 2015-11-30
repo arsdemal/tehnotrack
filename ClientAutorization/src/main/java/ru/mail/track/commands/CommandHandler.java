@@ -27,7 +27,7 @@ public class CommandHandler implements MessageListener {
     @Override
     public void onMessage(Session session, Message message) {
         Command cmd = commands.get(message.getType());
-        log.info("onMessage: {} type {}", message, message.getType());
+        log.debug("onMessage: {} type {}", message, message.getType());
         try {
             cmd.execute(session, message);
         } catch (IOException e) {

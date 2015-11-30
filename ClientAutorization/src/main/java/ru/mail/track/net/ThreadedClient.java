@@ -34,7 +34,6 @@ public class ThreadedClient {
             // создаем хендлер для перехвата и отправки собщений для inputHandler
             handler = new SocketConnectionHandler(protocol, session, socket);
             inputHandler = new InputHandler(session);
-            // слушаем наш хендлер
             handler.addListener(inputHandler);
 
             // запускаем новый поток хендлер

@@ -8,6 +8,7 @@ import ru.mail.track.session.Session;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 /**
     1) формирует сообщения и отдает их connectionHandler
@@ -26,7 +27,7 @@ public class InputHandler implements MessageListener {
     public void onMessage(Session session, Message message) {
         CommandType type = message.getType();
 
-        log.info("onMessage: {} type {}", message, type);
+        log.debug("onMessage: {} type {}", message, type);
         switch (type) {
             case MSG_INFO:
                 InfoMessage infoMsg = (InfoMessage) message;
@@ -36,25 +37,45 @@ public class InputHandler implements MessageListener {
                 SendMessage sendMsg = (SendMessage) message;
                 System.out.println(sendMsg.getMessage());
                 break;
+            // принимаем сообщение о регистрации, вводим данные, затем повторно отправляем на сервер
+            case USER_REG:
+                break;
         }
     }
 
     public void processInput(String line) throws IOException {
         String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
+        log.debug("Tokens: {}", Arrays.toString(tokens));
         String cmdType = tokens[0];
 
         //обрабатываем информацию с консоли
         switch (cmdType) {
             case "login":
                 //создаем LoginMessage и отдаем хендлеру
-                LoginMessage loginMessage = new LoginMessage();
-                loginMessage.setType(CommandType.USER_LOGIN);
-                if (tokens.length == 3) {
+                if (tokens.length == 3) { // логинимся
+                    LoginMessage loginMessage = new LoginMessage();
+                    loginMessage.setType(CommandType.USER_LOGIN);
                     loginMessage.setLogin(tokens[1]);
                     loginMessage.setPass(tokens[2]);
+                    session.getConnectionHandler().send(loginMessage);
+                } else { // регистрируемся
+                    log.info("Enter your login password");
+                    RegisterMessage regMsg = new RegisterMessage();
+                    regMsg.setType(CommandType.USER_REG);
+                    Scanner scanner = new Scanner(System.in);
+                    String[] regTokens = scanner.nextLine().split(" ");
+                    if ( regTokens.length != 2) {
+                        log.info("Incorrect data");
+                    } else {
+                        regMsg.setLogin(regTokens[0]);
+                        regMsg.setPass(regTokens[1]);
+                        try {
+                            session.getConnectionHandler().send(regMsg);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-                session.getConnectionHandler().send(loginMessage);
                 break;
             case "send":
                 SendMessage sendMessage = new SendMessage();

@@ -19,7 +19,7 @@ public class HelpCommand implements Command {
     public void execute(Session session, Message message) {
         InfoMessage infoMessage = new InfoMessage();
         infoMessage.setType(CommandType.MSG_INFO);
-        infoMessage.setInfo("test");
+        infoMessage.setInfo("");
         try {
             session.getConnectionHandler().send(infoMessage);
         } catch (IOException e) {
