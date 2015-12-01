@@ -6,6 +6,8 @@ import ru.mail.track.message.UserInfoMessage;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -13,19 +15,21 @@ import java.io.IOException;
 public class UserInfoCommand implements Command {
     @Override
     public void execute(Session session, Message message) throws IOException {
-        InfoMessage info = new InfoMessage();
-        info.setType(CommandType.MSG_INFO);
+        InfoMessage infoMessage = new InfoMessage();
+        infoMessage.setType(CommandType.MSG_INFO);
+        List<String> info = new ArrayList<>();
 
         UserInfoMessage userMessage = (UserInfoMessage) message;
 
         if (session.getSessionUser() == null ) {
-            info.setInfo("You are not logged in");
+            info.add("You are not logged in");
         } else {
             //session.getSessionUser().setName(userMessage.getUserName());
-            info.setInfo("Success");
+            info.add("Success");
         }
 
-        session.getConnectionHandler().send(info);
+        infoMessage.setInfo(info);
+        session.getConnectionHandler().send(infoMessage);
 
     }
 }

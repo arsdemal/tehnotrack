@@ -36,7 +36,7 @@ public class StringProtocol implements Protocol {
                 return new HelpMessage();
             case MSG_INFO:
                 InfoMessage infoMessage = new InfoMessage();
-                infoMessage.setInfo(tokens[1]);
+                //infoMessage.setInfo(tokens[1]);
                 return infoMessage;
             case CHAT_LIST:
                 return new ChatListMessage();

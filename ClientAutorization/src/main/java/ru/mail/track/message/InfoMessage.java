@@ -2,18 +2,21 @@ package ru.mail.track.message;
 /**
  *  Информирующее сообщение от клиента
  */
+
 import ru.mail.track.commands.CommandType;
 
+import java.util.List;
+
 public class InfoMessage extends Message {
-    private String info = null;
+    private List<String> info = null;
 
     public InfoMessage() { this.setType(CommandType.MSG_INFO);}
 
-    public void setInfo(String info){
+    public void setInfo(List<String> info){
         this.info = info;
     }
 
-    public String getInfo() {
+    public List<String> getInfo() {
         return info;
     }
 

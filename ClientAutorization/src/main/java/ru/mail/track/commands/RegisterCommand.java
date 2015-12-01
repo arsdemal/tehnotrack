@@ -7,6 +7,8 @@ import ru.mail.track.net.SessionManager;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -27,21 +29,22 @@ public class RegisterCommand implements Command {
     public void execute(Session session, Message message) throws IOException {
 
         RegisterMessage regMsg = (RegisterMessage) message;
-        InfoMessage infoMsg = new InfoMessage();
-        infoMsg.setType(CommandType.MSG_INFO);
+        InfoMessage infoMessage = new InfoMessage();
+        infoMessage.setType(CommandType.MSG_INFO);
+        List<String> info = new ArrayList<>();
 
         if ( userStore.isUserExist(regMsg.getLogin())) {
             log.info("This user already exist");
-            infoMsg.setInfo("This user already exist");
+            info.add("This user already exist");
         } else {
             User user = new User(regMsg.getLogin(),regMsg.getPass());
             userStore.addUser(user);
             session.setSessionUser(user);
             sessionManager.registerUser(user.getId(), session.getId());
             log.info("Success register");
-            infoMsg.setInfo("Success register");
+            info.add("Success register");
         }
-
-        session.getConnectionHandler().send(infoMsg);
+        infoMessage.setInfo(info);
+        session.getConnectionHandler().send(infoMessage);
     }
 }

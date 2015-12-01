@@ -6,6 +6,8 @@ import ru.mail.track.message.UserPassMessage;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,20 +18,22 @@ public class UserPassCommand implements Command {
     public void execute(Session session, Message message) throws IOException {
 
         UserPassMessage passMsg = (UserPassMessage) message;
-        InfoMessage info = new InfoMessage();
-        info.setType(CommandType.MSG_INFO);
+        InfoMessage infoMessage = new InfoMessage();
+        infoMessage.setType(CommandType.MSG_INFO);
+        List<String> info = new ArrayList<>();
 
         if (session.getSessionUser() == null ) {
-            info.setInfo("You are not logged in");
+            info.add("You are not logged in");
         } else {
             if (!session.getSessionUser().getPass().equals(passMsg.getOldPass())) {
-                info.setInfo("Password mismatch");
+                info.add("Password mismatch");
             } else {
                 session.getSessionUser().setPass(passMsg.getNewPass());
-                info.setInfo("Success");
+                info.add("Success");
             }
 
         }
-        session.getConnectionHandler().send(info);
+        infoMessage.setInfo(info);
+        session.getConnectionHandler().send(infoMessage);
     }
 }

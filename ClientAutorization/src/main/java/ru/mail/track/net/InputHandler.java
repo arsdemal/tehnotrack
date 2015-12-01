@@ -33,7 +33,8 @@ public class InputHandler implements MessageListener {
         switch (type) {
             case MSG_INFO:
                 InfoMessage infoMsg = (InfoMessage) message;
-                log.info(infoMsg.getInfo());
+                List<String> infoList = infoMsg.getInfo();
+                infoList.forEach(log::info);
                 break;
             case MSG_SEND:
                 SendMessage sendMsg = (SendMessage) message;
@@ -123,6 +124,19 @@ public class InputHandler implements MessageListener {
                 }
                 chatCreateMsg.setUsersId(usersId);
                 session.getConnectionHandler().send(chatCreateMsg);
+                break;
+            case "chat_find":
+                ChatFindMessage findMessage = new ChatFindMessage();
+                findMessage.setType(CommandType.CHAT_FIND);
+                findMessage.setChatId(Long.parseLong(tokens[1]));
+                findMessage.setRegex(tokens[2]);
+                session.getConnectionHandler().send(findMessage);
+                break;
+            case "chat_history":
+                ChatHistoryMessage historyMessage = new ChatHistoryMessage();
+                historyMessage.setType(CommandType.CHAT_HISTORY);
+                historyMessage.setChatId(Long.parseLong(tokens[1]));
+                session.getConnectionHandler().send(historyMessage);
                 break;
             default:
                 System.out.println("Invalid input: " + line);

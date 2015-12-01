@@ -25,14 +25,14 @@ public class ChatListCommand implements ChatCommand {
 
     @Override
     public void execute(Session session, Message message) throws IOException {
+
+        InfoMessage infoMessage = new InfoMessage();
+        infoMessage.setType(CommandType.MSG_INFO);
+        List<String> info = new ArrayList<>();
+
         if (session.getSessionUser() == null) {
-            InfoMessage info = new InfoMessage();
-            info.setType(CommandType.MSG_INFO);
-            info.setInfo("No login");
-            session.getConnectionHandler().send(info);
+            info.add("No login");
         } else {
-            InfoMessage infoMessage = new InfoMessage();
-            infoMessage.setType(CommandType.MSG_INFO);
             String chatsId = "";
             // записываем информацию в строку
             List<Long> chatsList = (ArrayList)messageStore.getChatsByUserId(session.getSessionUser().getId());
@@ -40,8 +40,10 @@ public class ChatListCommand implements ChatCommand {
                 chatsId += chatLong.toString();
             }
             log.info(chatsId);
-            infoMessage.setInfo(chatsId);
-            session.getConnectionHandler().send(infoMessage);
+            info.add(chatsId);
         }
+
+        infoMessage.setInfo(info);
+        session.getConnectionHandler().send(infoMessage);
     }
 }

@@ -9,6 +9,7 @@ import ru.mail.track.message.MessageStore;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ public class ChatCreateCommand implements Command{
 
         InfoMessage infoMessage = new InfoMessage();
         infoMessage.setType(CommandType.MSG_INFO);
+        List<String> info = new ArrayList<>();
 
         ChatCreateMessage chatCreateMessage = (ChatCreateMessage) message;
         List<Long> usersId = chatCreateMessage.getUsersId();
@@ -38,13 +40,14 @@ public class ChatCreateCommand implements Command{
 
         if ( messageStore.isChatExist(usersId)) {
             log.info("chat is exist");
-            infoMessage.setInfo("chat is exist");
+            info.add("chat is exist");
         } else {
             messageStore.createChat(usersId);
             log.info("Success create chat");
-            infoMessage.setInfo("Success create chat");
+            info.add("Success create chat");
         }
 
+        infoMessage.setInfo(info);
         session.getConnectionHandler().send(infoMessage);
     }
 }

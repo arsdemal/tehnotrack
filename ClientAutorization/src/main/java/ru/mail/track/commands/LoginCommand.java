@@ -7,6 +7,8 @@ import ru.mail.track.net.SessionManager;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  логинимся если приходит полное сообщение
@@ -27,13 +29,14 @@ public class LoginCommand implements Command {
     public void execute(Session session, Message message) {
 
         User user = null;
-        InfoMessage infoMsg = new InfoMessage();
-        infoMsg.setType(CommandType.MSG_INFO);
+        InfoMessage infoMessage = new InfoMessage();
+        infoMessage.setType(CommandType.MSG_INFO);
+        List<String> info = new ArrayList<>();
 
         if (session.getSessionUser() != null) {
 
             log.info("User {} already logged in.", session.getSessionUser()); // выводим информацию на сервер
-            infoMsg.setInfo("User already logged in."); // дублируем сообщение и отправляем пользователю
+            info.add("User already logged in."); // дублируем сообщение и отправляем пользователю
 
         } else {
 
@@ -43,26 +46,27 @@ public class LoginCommand implements Command {
                 user = userStore.getUser(loginMsg.getLogin(), loginMsg.getPass());
                 if (user == null) {
                     log.info("User {} no exist.", session.getSessionUser());
-                    infoMsg.setInfo("User no exist.");
+                    info.add("User no exist.");
                 }
             } else {
                 log.info("Incorrect data");
-                infoMsg.setInfo("Incorrect data");
+                info.add("Incorrect data");
             }
 
             if (user != null) {
                 session.setSessionUser(user);
                 sessionManager.registerUser(user.getId(), session.getId());
                 log.info("Success login: {}", user);
-                infoMsg.setInfo("Success login:");
+                info.add("Success login:");
             } else {
                 log.info("No success login");
-                infoMsg.setInfo("No success login");
+                info.add("No success login");
             }
         }
 
         try {
-            session.getConnectionHandler().send(infoMsg);
+            infoMessage.setInfo(info);
+            session.getConnectionHandler().send(infoMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
