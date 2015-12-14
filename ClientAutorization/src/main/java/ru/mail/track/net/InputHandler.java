@@ -59,23 +59,28 @@ public class InputHandler implements MessageListener {
                     session.getConnectionHandler().send(loginMessage);
                 } else { // регистрируемся
 
-                    log.info("Enter your login password");
-
-                    RegisterMessage regMsg = new RegisterMessage();
-                    regMsg.setType(CommandType.USER_REG);
-
-                    Scanner scanner = new Scanner(System.in);
-                    String[] regTokens = scanner.nextLine().split(" ");
-
-                    if ( regTokens.length != 2) {
+                    if (tokens.length != 1) {
                         log.info("Incorrect data");
-                    } else {
-                        try {
-                            regMsg.setLogin(regTokens[0]);
-                            regMsg.setPass(regTokens[1]);
-                            session.getConnectionHandler().send(regMsg);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    }
+                    else {
+                        log.info("Enter your login password");
+
+                        RegisterMessage regMsg = new RegisterMessage();
+                        regMsg.setType(CommandType.USER_REG);
+
+                        Scanner scanner = new Scanner(System.in);
+                        String[] regTokens = scanner.nextLine().split(" ");
+
+                        if (regTokens.length != 2) {
+                            log.info("Incorrect data");
+                        } else {
+                            try {
+                                regMsg.setLogin(regTokens[0]);
+                                regMsg.setPass(regTokens[1]);
+                                session.getConnectionHandler().send(regMsg);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -83,7 +88,16 @@ public class InputHandler implements MessageListener {
             case "send":
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setType(CommandType.MSG_SEND);
-                sendMessage.setChatId(Long.valueOf(tokens[1]));
+                if (tokens.length != 3) {
+                    log.info("Incorrect data");
+                    break;
+                }
+                try {
+                    sendMessage.setChatId(Long.valueOf(tokens[1]));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    break;
+                }
                 sendMessage.setMessage(tokens[2]);
                 session.getConnectionHandler().send(sendMessage);
                 break;
@@ -98,6 +112,10 @@ public class InputHandler implements MessageListener {
                 session.getConnectionHandler().send(chatListMessage);
                 break;
             case "user":
+                if (tokens.length!=2) {
+                    log.info("Incorrect data");
+                    break;
+                }
                 UserMessage userMessage = new UserMessage();
                 userMessage.setType(CommandType.USER_NICK);
                 userMessage.setUserName(tokens[1]);
@@ -109,6 +127,10 @@ public class InputHandler implements MessageListener {
                 session.getConnectionHandler().send(infoMsg);
                 break;
             case "user_pass":
+                if ( tokens.length != 3) {
+                    log.info("Incorrect data");
+                    break;
+                }
                 UserPassMessage passMsg = new UserPassMessage();
                 passMsg.setType(CommandType.USER_PASS);
                 passMsg.setOldPass(tokens[1]);
@@ -116,26 +138,53 @@ public class InputHandler implements MessageListener {
                 session.getConnectionHandler().send(passMsg);
                 break;
             case "chat_create":
+                if ( tokens.length < 2) {
+                    log.info("Incorrect data");
+                    break;
+                }
                 ChatCreateMessage chatCreateMsg = new ChatCreateMessage();
                 chatCreateMsg.setType(CommandType.CHAT_CREATE);
                 List<Long> usersId = new ArrayList<>();
                 for (int i = 1; i < tokens.length; i++) {
-                    usersId.add(Long.parseLong(tokens[i]));
+                    try {
+                        usersId.add(Long.parseLong(tokens[i]));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        break;
+                    }
                 }
                 chatCreateMsg.setUsersId(usersId);
                 session.getConnectionHandler().send(chatCreateMsg);
                 break;
             case "chat_find":
+                if ( tokens.length != 3 ) {
+                    log.info("Incorrect data");
+                    break;
+                }
                 ChatFindMessage findMessage = new ChatFindMessage();
                 findMessage.setType(CommandType.CHAT_FIND);
-                findMessage.setChatId(Long.parseLong(tokens[1]));
+                try {
+                    findMessage.setChatId(Long.parseLong(tokens[1]));
+                } catch ( NumberFormatException e) {
+                    e.printStackTrace();
+                    break;
+                }
                 findMessage.setRegex(tokens[2]);
                 session.getConnectionHandler().send(findMessage);
                 break;
             case "chat_history":
+                if ( tokens.length != 2) {
+                    log.info("Incorrect data");
+                    break;
+                }
                 ChatHistoryMessage historyMessage = new ChatHistoryMessage();
                 historyMessage.setType(CommandType.CHAT_HISTORY);
-                historyMessage.setChatId(Long.parseLong(tokens[1]));
+                try {
+                    historyMessage.setChatId(Long.parseLong(tokens[1]));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    break;
+                }
                 session.getConnectionHandler().send(historyMessage);
                 break;
             default:
