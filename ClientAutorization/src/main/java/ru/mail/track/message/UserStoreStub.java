@@ -1,7 +1,8 @@
 package ru.mail.track.message;
 
-import java.util.HashMap;
-import java.util.Map;
+import ru.mail.track.jdbc.DAOUser;
+
+import java.sql.SQLException;
 //import ru.mail.track.message.UserStore;
 
 /**
@@ -9,9 +10,15 @@ import java.util.Map;
  */
 public class UserStoreStub implements UserStore {
 
-    private static Map<Long, User> users = new HashMap<>();
+    //private static Map<Long, User> users = new HashMap<>();
 
-    static {
+    private DAOUser users;
+
+    public UserStoreStub(DAOUser users){
+        this.users = users;
+    }
+
+    /*static {
         User u0 = new User("A", "1");
         u0.setId(0L);
 
@@ -28,21 +35,26 @@ public class UserStoreStub implements UserStore {
         users.put(1L, u1);
         users.put(2L, u2);
         users.put(3L, u3);
-    }
+    }*/
 
     @Override
     public User addUser(User user) {
-        return users.put(user.getId(), user);
+        try {
+            users.addUser(user);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 
     @Override
     public User getUser(String login, String pass) {
-        for (User user : users.values()) {
-            if (user.getName().equals(login) && user.getPass().equals(pass)) {
-                return user;
-            }
+        try {
+            return users.getUser(login, pass);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -52,11 +64,11 @@ public class UserStoreStub implements UserStore {
 
     @Override
     public boolean isUserExist(String name) {
-        for (User user : users.values()) {
-            if (user.getName().equals(name)) {
-                return true;
-            }
+        try {
+            return users.isUserExist(name);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 }

@@ -3,5 +3,5 @@ package ru.mail.track.jdbc;
 /**
  *
  */
-public interface ChatDAO {
+public interface DAOMessage {
 }

@@ -10,14 +10,13 @@ import java.sql.SQLException;
  */
 public class PostgreDAOFactory extends DAOFactory {
 
-    public static final String DRIVER=
-            "COM.cloudscape.core.RmiJdbcDriver";
-    public static final String DBURL=
-            "jdbc:cloudscape:rmi://localhost:1099/CoreJ2EEDB";
+    public static Connection createConnection()  {
 
-    public static Connection createConnection() throws ClassNotFoundException, SQLException {
-
-        Class.forName("org.postgresql.Driver");
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         PGPoolingDataSource source = new PGPoolingDataSource();
         source.setDataSourceName("My DB");
@@ -27,11 +26,16 @@ public class PostgreDAOFactory extends DAOFactory {
         source.setPassword("ubuntu");
         source.setMaxConnections(10);
 
-        return source.getConnection();
+        try {
+            return source.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public ChatDAO getChatDAO(Connection connection) {
+    public DAOChat getChatDAO(Connection connection) {
         return null;
     }
 
@@ -41,7 +45,7 @@ public class PostgreDAOFactory extends DAOFactory {
     }
 
     @Override
-    public MessageDAO getMessageDAO(Connection connection) {
+    public DAOMessage getMessageDAO(Connection connection) {
         return null;
     }
 }

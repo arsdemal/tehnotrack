@@ -19,13 +19,23 @@ public class PostgreDAOUser implements DAOUser {
     }
 
     @Override
-    public int addUser(User user) throws SQLException {
+    public void addUser(User user) throws SQLException {
 
         Statement stmt = null;
         stmt = connection.createStatement();
 
+        String sqlMaxId = "SELECT MAX(id) FROM \"user\";";
+
+        ResultSet res = stmt.executeQuery(sqlMaxId);
+
+        res.next();
+
+        Long maxId = res.getLong(1) + 1L;
+
+        res.close();
+
         String sql = "INSERT INTO \"user\" (ID,LOGIN,PASSWORD) "
-                + "VALUES (" + user.getId() + ",'" + user.getName()
+                + "VALUES (" + maxId + ",'" + user.getName()
                 + "','" + user.getPass() + "');";
 
         stmt.executeUpdate(sql);
@@ -36,8 +46,7 @@ public class PostgreDAOUser implements DAOUser {
         } catch (SQLException e) {
             e.printStackTrace();
         }*/
-
-        return 0;
+        
     }
 
     @Override
@@ -46,10 +55,10 @@ public class PostgreDAOUser implements DAOUser {
     }
 
     @Override
-    public User findUser(String login) throws SQLException {
+    public User getUser(String login, String pass) throws SQLException {
         Statement stmt = connection.createStatement();
 
-        String sql = "SELECT * FROM \"user\" WHERE login = '"+ login + "';"; // and password ='" + user.getPass() + "'";
+        String sql = "SELECT * FROM \"user\" WHERE login = '"+ login + "' AND password = '"+ pass + "';";
 
         ResultSet res = stmt.executeQuery(sql);
 
@@ -57,7 +66,6 @@ public class PostgreDAOUser implements DAOUser {
 
         while (res.next()) {
             Long id = res.getLong("id");
-            String pass = res.getString("password");
             user = new User(login,pass);
             user.setId(id);
         }
@@ -74,7 +82,20 @@ public class PostgreDAOUser implements DAOUser {
     }
 
     @Override
-    public boolean isUserExist() {
+    public boolean isUserExist(String login) throws SQLException {
+
+        Statement stmt = connection.createStatement();
+
+        String sql = "SELECT * FROM \"user\" WHERE login = '"+ login + "';";
+        ResultSet res = stmt.executeQuery(sql);
+
+        while (res.next()) {
+            return true;
+        }
+
+        res.close();
+        stmt.close();
+
         return false;
     }
 

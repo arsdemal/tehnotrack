@@ -3,6 +3,8 @@ package ru.mail.track.net;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.track.commands.*;
+import ru.mail.track.jdbc.DAOUser;
+import ru.mail.track.jdbc.PostgreDAOFactory;
 import ru.mail.track.message.MessageStore;
 import ru.mail.track.message.MessageStoreStub;
 import ru.mail.track.message.UserStore;
@@ -11,6 +13,7 @@ import ru.mail.track.message.UserStoreStub;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -48,7 +51,11 @@ public class ThreadedServer {
         Protocol protocol = new SerializeProtocol();
         SessionManager sessionManager = new SessionManager();
 
-        UserStore userStore = new UserStoreStub();
+        PostgreDAOFactory factory = new PostgreDAOFactory();
+        Connection connection = factory.createConnection();
+        DAOUser daoUser = factory.getUserDAO(connection);
+
+        UserStore userStore = new UserStoreStub(daoUser);
         MessageStore messageStore = new MessageStoreStub();
 
         Map<CommandType, Command> cmds = new HashMap<>();

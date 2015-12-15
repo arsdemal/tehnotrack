@@ -9,15 +9,15 @@ import java.sql.SQLException;
  */
 public interface DAOUser {
 
-    int addUser(User user) throws SQLException;
+    void addUser(User user) throws SQLException;
 
     boolean deleteUser();
 
-    User findUser(String login) throws SQLException;
+    User getUser(String login, String pass) throws SQLException;
 
     boolean updateUser();
 
-    boolean isUserExist();
+    boolean isUserExist(String login) throws SQLException;
 
     Long getUserById();
 
