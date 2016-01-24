@@ -36,7 +36,7 @@ public class PostgreDAOFactory extends DAOFactory {
 
     @Override
     public DAOChat getChatDAO(Connection connection) {
-        return null;
+        return new PostgreDAOChat(connection);
     }
 
     @Override

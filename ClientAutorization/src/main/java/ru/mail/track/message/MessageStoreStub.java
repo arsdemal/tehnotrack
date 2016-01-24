@@ -1,5 +1,8 @@
 package ru.mail.track.message;
 
+import ru.mail.track.jdbc.DAOChat;
+
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -9,6 +12,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MessageStoreStub implements MessageStore {
 
     public static final AtomicLong counter = new AtomicLong(0);
+
+    private DAOChat chats;
 
     List<SendMessage> messages1 = Arrays.asList(
             new SendMessage(1L, "msg1_1"),
@@ -27,6 +32,11 @@ public class MessageStoreStub implements MessageStore {
 
     Map<Long, Message> messages = new HashMap<>();
 
+    public MessageStoreStub(DAOChat daoChat){
+        this.chats = daoChat;
+    }
+
+    /*
     static Map<Long, Chat> chats = new HashMap<>();
 
     static {
@@ -43,39 +53,55 @@ public class MessageStoreStub implements MessageStore {
 
         chats.put(1L, chat1);
         chats.put(2L, chat2);
-    }
+    }*/
 
     @Override
     public List<Long> getChatsByUserId(Long userId) {
-        List<Long> chatsId = new ArrayList();
-        for (Long key: chats.keySet()) {
-            if (chats.get(key).getParticipantIds().contains(userId)) {
-                chatsId.add(chats.get(key).getId());
-            }
+        try {
+            return chats.getChatsByUserId(userId);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return chatsId;
+        return null;
     }
 
     @Override
     public Chat getChatById(Long chatId) {
-        return chats.get(chatId);
+        try {
+            return chats.getChatById(chatId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public List<Long> getMessagesFromChat(Long chatId) {
-        return chats.get(chatId).getMessageIds();
+        try {
+            return chats.getMessagesFromChat(chatId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public Message getMessageById(Long messageId) {
-        return messages.get(messageId);
+        try {
+            return chats.getMessageById(messageId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public void addMessage(Long chatId, Message message) {
-        message.setId(counter.getAndIncrement());
-        chats.get(chatId).addMessage(message.getId());
-        messages.put(message.getId(), message);
+        try {
+            chats.addMessage(chatId,message);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -84,22 +110,20 @@ public class MessageStoreStub implements MessageStore {
     }
 
     @Override
-    public void createChat(List<Long> usersId) {
-
-        Chat newChat = new Chat();
-        newChat.setId(counter.incrementAndGet());
-        newChat.setParticipantIds(usersId);
-        chats.put(newChat.getId(),newChat);
+    public void createChat(List<Long> usersId){
+        try {
+            chats.addChat(usersId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public boolean isChatExist(List<Long> usersId) {
-
-        for (Chat chat : chats.values()) {
-            List<Long> usersChat = chat.getParticipantIds();
-            if (usersChat.equals(usersId)){
-                return true;
-            }
+        try {
+            return chats.isChatExist(usersId);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return false;
     }
