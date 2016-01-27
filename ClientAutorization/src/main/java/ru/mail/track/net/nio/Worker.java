@@ -33,7 +33,7 @@ public class Worker implements ConnectionHandler {
     private SocketChannel socket;
     private NioServer server;
 
-    public Worker ( Protocol protocol, ChannelManager channelManager){
+    public Worker(Protocol protocol, ChannelManager channelManager){
         this.protocol = protocol;
         this.channelManager = channelManager;
     }
@@ -54,9 +54,11 @@ public class Worker implements ConnectionHandler {
 
 
     @Override
-    public void send(Message msg) throws IOException {
-        server.send(socket, protocol.encode(msg));
+    public void send(Session session, Message msg) throws IOException {
+
+        server.send(channelManager.getSocket(session), protocol.encode(msg));
     }
+
 
     @Override
     public void addListener(MessageListener listener) {
@@ -92,8 +94,15 @@ public class Worker implements ConnectionHandler {
                 } catch (ProtocolException e) {
                     e.printStackTrace();
                 }
+
+
                 msg.setSender(session.getId());
                 log.debug("message received: {}", msg);
+
+                /*if( msg.getType() == CommandType.MSG_SEND) {
+                    SendMessage sendMessage = (SendMessage) msg;
+                    daoChat.
+                }*/
 
                 session.setConnectionHandler(this);
                 server = dataEvent.server;

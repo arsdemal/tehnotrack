@@ -39,7 +39,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
     }
 
     @Override
-    public void send(Message msg) throws IOException {
+    public void send(Session session, Message msg) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(msg.toString());
         }

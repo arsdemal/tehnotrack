@@ -56,7 +56,7 @@ public class InputHandler implements MessageListener {
                     loginMessage.setType(CommandType.USER_LOGIN);
                     loginMessage.setLogin(tokens[1]);
                     loginMessage.setPass(tokens[2]);
-                    session.getConnectionHandler().send(loginMessage);
+                    session.getConnectionHandler().send(session, loginMessage);
                 } else { // регистрируемся
 
                     log.info("Enter your login password");
@@ -73,7 +73,7 @@ public class InputHandler implements MessageListener {
                         try {
                             regMsg.setLogin(regTokens[0]);
                             regMsg.setPass(regTokens[1]);
-                            session.getConnectionHandler().send(regMsg);
+                            session.getConnectionHandler().send(session, regMsg);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -85,35 +85,35 @@ public class InputHandler implements MessageListener {
                 sendMessage.setType(CommandType.MSG_SEND);
                 sendMessage.setChatId(Long.valueOf(tokens[1]));
                 sendMessage.setMessage(tokens[2]);
-                session.getConnectionHandler().send(sendMessage);
+                session.getConnectionHandler().send(session, sendMessage);
                 break;
             case "help":
                 HelpMessage helpMessage = new HelpMessage();
                 helpMessage.setType(CommandType.USER_HELP);
-                session.getConnectionHandler().send(helpMessage);
+                session.getConnectionHandler().send(session, helpMessage);
                 break;
             case "chat_list":
                 ChatListMessage chatListMessage = new ChatListMessage();
                 chatListMessage.setType(CommandType.CHAT_LIST);
-                session.getConnectionHandler().send(chatListMessage);
+                session.getConnectionHandler().send(session, chatListMessage);
                 break;
             case "user":
                 UserMessage userMessage = new UserMessage();
                 userMessage.setType(CommandType.USER_NICK);
                 userMessage.setUserName(tokens[1]);
-                session.getConnectionHandler().send(userMessage);
+                session.getConnectionHandler().send(session, userMessage);
                 break;
             case "user_info":
                 UserInfoMessage infoMsg = new UserInfoMessage();
                 infoMsg.setType(CommandType.USER_INF0);
-                session.getConnectionHandler().send(infoMsg);
+                session.getConnectionHandler().send(session, infoMsg);
                 break;
             case "user_pass":
                 UserPassMessage passMsg = new UserPassMessage();
                 passMsg.setType(CommandType.USER_PASS);
                 passMsg.setOldPass(tokens[1]);
                 passMsg.setNewPass(tokens[2]);
-                session.getConnectionHandler().send(passMsg);
+                session.getConnectionHandler().send(session, passMsg);
                 break;
             case "chat_create":
                 ChatCreateMessage chatCreateMsg = new ChatCreateMessage();
@@ -123,20 +123,20 @@ public class InputHandler implements MessageListener {
                     usersId.add(Long.parseLong(tokens[i]));
                 }
                 chatCreateMsg.setUsersId(usersId);
-                session.getConnectionHandler().send(chatCreateMsg);
+                session.getConnectionHandler().send(session, chatCreateMsg);
                 break;
             case "chat_find":
                 ChatFindMessage findMessage = new ChatFindMessage();
                 findMessage.setType(CommandType.CHAT_FIND);
                 findMessage.setChatId(Long.parseLong(tokens[1]));
                 findMessage.setRegex(tokens[2]);
-                session.getConnectionHandler().send(findMessage);
+                session.getConnectionHandler().send(session, findMessage);
                 break;
             case "chat_history":
                 ChatHistoryMessage historyMessage = new ChatHistoryMessage();
                 historyMessage.setType(CommandType.CHAT_HISTORY);
                 historyMessage.setChatId(Long.parseLong(tokens[1]));
-                session.getConnectionHandler().send(historyMessage);
+                session.getConnectionHandler().send(session, historyMessage);
                 break;
             default:
                 System.out.println("Invalid input: " + line);

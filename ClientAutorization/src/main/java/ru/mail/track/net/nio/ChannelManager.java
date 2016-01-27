@@ -26,4 +26,13 @@ public class ChannelManager {
         Session session = channelMap.get(socketChannel);
         return session;
     }
+
+    public SocketChannel getSocket(Session session) {
+        for ( SocketChannel h : channelMap.keySet()) {
+            if ( channelMap.get(h).equals(session)){
+                return h;
+            }
+        }
+        return null;
+    }
 }

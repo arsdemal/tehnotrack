@@ -29,7 +29,7 @@ public class UserInfoCommand implements Command {
         }
 
         infoMessage.setInfo(info);
-        session.getConnectionHandler().send(infoMessage);
+        session.getConnectionHandler().send(session, infoMessage);
         //return infoMessage;
 
     }

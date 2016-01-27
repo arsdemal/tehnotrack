@@ -25,7 +25,7 @@ public class HelpCommand implements Command {
         info.add("");
         infoMessage.setInfo(info);
         try {
-            session.getConnectionHandler().send(infoMessage);
+            session.getConnectionHandler().send(session, infoMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -66,7 +66,7 @@ public class LoginCommand implements Command {
 
         infoMessage.setInfo(info);
         try {
-            session.getConnectionHandler().send(infoMessage);
+            session.getConnectionHandler().send(session, infoMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }

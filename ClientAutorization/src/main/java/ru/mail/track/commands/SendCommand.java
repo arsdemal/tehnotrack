@@ -39,7 +39,7 @@ public class SendCommand implements Command {
                 for (Long userId : parts) {
                     Session userSession = sessionManager.getSessionByUser(userId);
                     if (userSession != null) {
-                        userSession.getConnectionHandler().send(message);
+                        session.getConnectionHandler().send(userSession, message);
                     }
                 }
             } catch (IOException e) {
@@ -50,7 +50,7 @@ public class SendCommand implements Command {
 
         infoMessage.setInfo(info);
         try {
-            session.getConnectionHandler().send(infoMessage);
+            session.getConnectionHandler().send(session, infoMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }

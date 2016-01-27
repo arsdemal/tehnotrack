@@ -49,6 +49,6 @@ public class ChatCreateCommand implements Command{
 
         infoMessage.setInfo(info);
         //return infoMessage;
-        session.getConnectionHandler().send(infoMessage);
+        session.getConnectionHandler().send(session, infoMessage);
     }
 }

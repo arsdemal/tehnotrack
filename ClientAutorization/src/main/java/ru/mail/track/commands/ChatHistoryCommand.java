@@ -37,7 +37,7 @@ public class ChatHistoryCommand implements ChatCommand {
         }
 
         infoMessage.setInfo(history);
-        session.getConnectionHandler().send(infoMessage);
+        session.getConnectionHandler().send(session, infoMessage);
         //return infoMessage;
 
     }

@@ -45,7 +45,7 @@ public class RegisterCommand implements Command {
             info.add("Success register");
         }
         infoMessage.setInfo(info);
-        session.getConnectionHandler().send(infoMessage);
+        session.getConnectionHandler().send(session, infoMessage);
         //return infoMessage;
     }
 }
