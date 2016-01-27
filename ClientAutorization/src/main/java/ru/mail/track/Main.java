@@ -1,56 +1,56 @@
 package ru.mail.track;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ru.mail.track.commands.*;
 import ru.mail.track.jdbc.DAOChat;
+import ru.mail.track.jdbc.DAOUser;
 import ru.mail.track.jdbc.PostgreDAOFactory;
+import ru.mail.track.message.MessageStore;
+import ru.mail.track.message.MessageStoreStub;
+import ru.mail.track.message.UserStore;
+import ru.mail.track.message.UserStoreStub;
+import ru.mail.track.net.Protocol;
+import ru.mail.track.net.SerializeProtocol;
+import ru.mail.track.net.SessionManager;
+import ru.mail.track.net.nio.NioServer;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
+    public static void main(String[] args) throws Exception {
 
-    static Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
+        // Предустановки для серверов
+        Protocol protocol = new SerializeProtocol();
+        SessionManager sessionManager = new SessionManager();
 
         PostgreDAOFactory factory = new PostgreDAOFactory();
         Connection connection = factory.createConnection();
+        DAOUser daoUser = factory.getUserDAO(connection);
         DAOChat daoChat = factory.getChatDAO(connection);
 
-        List<Long> users = new ArrayList<>();
-        users.add(1L);
-        users.add(2L);
-        users.add(3L);
+        UserStore userStore = new UserStoreStub(daoUser);
+        MessageStore messageStore = new MessageStoreStub(daoChat);
 
-        List<Long> users2 = new ArrayList<>();
-        users2.add(1L);
-        users2.add(2L);
+        Map<CommandType, Command> cmds = new HashMap<>();
+        cmds.put(CommandType.USER_LOGIN, new LoginCommand(userStore, sessionManager));
+        cmds.put(CommandType.MSG_SEND, new SendCommand(sessionManager, messageStore));
+        cmds.put(CommandType.USER_HELP, new HelpCommand(cmds));
+        cmds.put(CommandType.CHAT_LIST, new ChatListCommand(messageStore));
+        cmds.put(CommandType.USER_NICK, new UserCommand(userStore));
+        cmds.put(CommandType.USER_INF0, new UserInfoCommand());
+        cmds.put(CommandType.USER_PASS, new UserPassCommand());
+        cmds.put(CommandType.USER_REG, new RegisterCommand(userStore,sessionManager));
+        cmds.put(CommandType.CHAT_CREATE, new ChatCreateCommand(messageStore));
+        cmds.put(CommandType.CHAT_HISTORY, new ChatHistoryCommand(messageStore));
+        cmds.put(CommandType.CHAT_FIND, new ChatFindCommand(messageStore));
 
-        try {
-            daoChat.addChat(users);
-            daoChat.addChat(users2);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        CommandHandler handler = new CommandHandler(cmds);
 
-        try {
-            if ( daoChat.isChatExist(users)) {
-                log.info("true");
-            } else {
-                log.info("false");
-            }
-            if ( daoChat.isChatExist(users2)) {
-                log.info("true");
-            } else {
-                log.info("false");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Thread t = new Thread(new NioServer(protocol,sessionManager,handler));
+        t.start();
 
     }
 

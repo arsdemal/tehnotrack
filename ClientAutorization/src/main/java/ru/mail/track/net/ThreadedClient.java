@@ -9,18 +9,15 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
-//import ru.mail.track.reflection.di.Auto;
-
-
 public class ThreadedClient {
 
     public static final int PORT = 19000;
     public static final String HOST = "localhost";
     static Logger log = LoggerFactory.getLogger(ThreadedClient.class);
+
     ConnectionHandler handler;
     InputHandler inputHandler;
 
-    //@Auto(isRequired = true)
     private Protocol protocol = new SerializeProtocol();
 
     public ThreadedClient() {
@@ -47,7 +44,6 @@ public class ThreadedClient {
     }
 
     public static void main(String[] args) throws Exception {
-        Protocol protocol = new StringProtocol();
         ThreadedClient client = new ThreadedClient();
 
         client.init(); // включили клиент
@@ -55,6 +51,7 @@ public class ThreadedClient {
         // вводим иформацию в консоль
         Scanner scanner = new Scanner(System.in);
         System.out.println("$");
+
         while (true) {
             String input = scanner.nextLine();
             if ("q".equals(input)) {
@@ -62,6 +59,7 @@ public class ThreadedClient {
             }
             client.inputHandler.processInput(input);
         }
+
     }
 
 
