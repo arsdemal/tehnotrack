@@ -9,7 +9,10 @@ import ru.mail.track.net.Protocol;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,17 +25,36 @@ public class Worker implements ConnectionHandler {
     // подписчики
     private List<MessageListener> listeners = new ArrayList<>();
     private Protocol protocol;
-    private Session session;
+    private ChannelManager channelManager;
+    // очередь на исполнение событий
+    private List queue = new LinkedList();
 
-    public Worker ( Session session, Protocol protocol){
+    private SocketChannel socket;
+    private NioServer server;
+
+    public Worker ( Protocol protocol, ChannelManager channelManager){
         this.protocol = protocol;
-        this.session = session;
-        session.setConnectionHandler(this);
+        this.channelManager = channelManager;
     }
+
+    public void processData(NioServer server, SocketChannel socket, byte[] data, int count) {
+        byte[] dataCopy = new byte[count];
+        System.arraycopy(data, 0, dataCopy, 0, count);
+        synchronized(queue) {
+            queue.add(new ServerDataEvent(server, socket, dataCopy));
+            queue.notify();
+        }
+    }
+
+    public void notifyListeners(Session session, Message msg) {
+        listeners.forEach(it -> it.onMessage(session, msg));
+    }
+
+
 
     @Override
     public void send(Message msg) throws IOException {
-
+        server.send(socket, protocol.encode(msg));
     }
 
     @Override
@@ -47,6 +69,38 @@ public class Worker implements ConnectionHandler {
 
     @Override
     public void run() {
+
+        ServerDataEvent dataEvent;
+
+        while(true) {
+            // Wait for data to become available
+            synchronized (queue) {
+                while (queue.isEmpty()) {
+                    try {
+                        queue.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                dataEvent = (ServerDataEvent) queue.remove(0);
+                Session session = channelManager.getSession(dataEvent.socket);
+                Message msg = protocol.decode(Arrays.copyOf(dataEvent.data,dataEvent.data.length));
+                msg.setSender(session.getId());
+                log.debug("message received: {}", msg);
+
+                session.setConnectionHandler(this);
+                server = dataEvent.server;
+                socket = dataEvent.socket;
+
+                notifyListeners(session, msg);
+
+                //Message infoMessage = commandHandler.onMessage(session,);
+
+            }
+
+            //Return to sender
+        }
 
     }
 }

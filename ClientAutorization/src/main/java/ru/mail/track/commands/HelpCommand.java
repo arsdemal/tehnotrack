@@ -23,11 +23,13 @@ public class HelpCommand implements Command {
         infoMessage.setType(CommandType.MSG_INFO);
         List<String> info = new ArrayList<>();
         info.add("");
+        infoMessage.setInfo(info);
         try {
-            infoMessage.setInfo(info);
             session.getConnectionHandler().send(infoMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //return infoMessage;
+
     }
 }

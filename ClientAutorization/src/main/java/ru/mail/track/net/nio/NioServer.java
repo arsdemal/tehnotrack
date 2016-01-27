@@ -3,181 +3,242 @@ package ru.mail.track.net.nio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.track.commands.CommandHandler;
-import ru.mail.track.message.Message;
-import ru.mail.track.net.ConnectionHandler;
 import ru.mail.track.net.Protocol;
-import ru.mail.track.net.Server;
 import ru.mail.track.net.SessionManager;
+import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 
 /**
  *
  */
-public class NioServer implements Runnable,Server {
+public class NioServer implements Runnable {
 
-    static Logger log = LoggerFactory.getLogger(NewNioServer.class);
+    static Logger log = LoggerFactory.getLogger(NioServer.class);
 
-    public static final int PORT = 19000;
-
-    private Selector selector;
-    private ByteBuffer readBuffer = ByteBuffer.allocate(16); // буфер, с которым будем работать
-    private Map<SocketChannel, ByteBuffer> dataToWrite = new ConcurrentHashMap<>(); // Данные для записи в канал
-
-    private ExecutorService service = Executors.newFixedThreadPool(5);
-
-
-    private volatile boolean isRunning;
-    private Map<Long, ConnectionHandler> handlers = new HashMap<>();
     private Protocol protocol;
     private SessionManager sessionManager;
     private CommandHandler commandHandler;
 
-    public NioServer(Protocol protocol, SessionManager sessionManager, CommandHandler commandHandler) throws Exception {
-        selector = Selector.open();
+    // The host:port combination to listen on
+    private InetAddress hostAddress;
+    private int port;
 
-        // Установили протокол передачи сообщений
+    // The channel on which we'll accept connections
+    private ServerSocketChannel serverChannel;
+
+    // The selector we'll be monitoring
+    private Selector selector;
+
+    // The buffer into which we'll read data when it's available
+    private ByteBuffer readBuffer = ByteBuffer.allocate(8192);
+
+    private Worker worker;
+
+    // A list of ChangeRequest instances
+    private List changeRequests = new LinkedList();
+
+    // Maps a SocketChannel to a list of ByteBuffer instances
+    private Map pendingData = new HashMap();
+
+    //
+    private ChannelManager channelManager;
+
+
+
+    public NioServer(Protocol protocol, SessionManager sessionManager, CommandHandler commandHandler) throws IOException {
         this.protocol = protocol;
-
-        // Управление сессиями
         this.sessionManager = sessionManager;
-
-        // Выполнение команд
+        this.channelManager = new ChannelManager();
         this.commandHandler = commandHandler;
+        this.hostAddress = null;
+        this.port = 9090;
+        selector = initSelector();
+
+        // Запускаем обработчиков
+        worker = new Worker(protocol, channelManager);
+        worker.addListener(commandHandler);
+        Thread t = new Thread(worker);
+        t.start();
 
 
+    }
 
-        // Это серверный сокет
-        ServerSocketChannel socketChannel = ServerSocketChannel.open();
+    private Selector initSelector() throws IOException {
+        // Create a new selector
+        Selector socketSelector = SelectorProvider.provider().openSelector();
 
-        // Привязали его к порту
-        socketChannel.socket().bind(new InetSocketAddress(PORT));
+        // Create a new non-blocking server socket channel
+        serverChannel = ServerSocketChannel.open();
+        serverChannel.configureBlocking(false);
 
-        // Должен быть неблокирующий для работы через selector
-        socketChannel.configureBlocking(false);
+        // Bind the server socket to the specified address and port
+        InetSocketAddress isa = new InetSocketAddress(this.hostAddress, this.port);
+        serverChannel.socket().bind(isa);
 
-        // Нас интересует событие коннекта клиента (как и для Socket - ACCEPT)
-        socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        // Register the server socket channel, indicating an interest in
+        // accepting new connections
+        serverChannel.register(socketSelector, SelectionKey.OP_ACCEPT);
+
+        return socketSelector;
     }
 
     @Override
     public void run() {
-
-
-
         while (true) {
             try {
-                log.info("Waiting on select()");
+                // Process any pending changes
+                synchronized(changeRequests) {
+                    Iterator changes = this.changeRequests.iterator();
+                    while (changes.hasNext()) {
+                        ChangeRequest change = (ChangeRequest) changes.next();
+                        switch(change.type) {
+                            case ChangeRequest.CHANGEOPS:
+                                SelectionKey key = change.socket.keyFor(this.selector);
+                                key.interestOps(change.ops);
+                        }
+                    }
+                    this.changeRequests.clear();
+                }
 
-                // Блокируемся до получения евента на зарегистрированных каналах
+                log.info("Waiting on select()");
+                // Wait for an event one of the registered channels
                 int num = selector.select();
                 log.info("Raised events on {} channels", num);
 
-                // Смторим, кто сгенерил евенты
-                Set<SelectionKey> keys = selector.selectedKeys();
-                Iterator<SelectionKey> it = keys.iterator();
+                // Iterate over the set of keys for which events are available
+                Iterator selectedKeys = this.selector.selectedKeys().iterator();
+                while (selectedKeys.hasNext()) {
+                    SelectionKey key = (SelectionKey) selectedKeys.next();
+                    selectedKeys.remove();
 
-                // Проходим по всем источникам
-                while (it.hasNext()) {
-                    SelectionKey key = it.next();
+                    if (!key.isValid()) {
+                        continue;
+                    }
 
-                    // Если кто-то готов присоединиться
+                    // Check what event is available and deal with it
                     if (key.isAcceptable()) {
                         log.info("[acceptable]");
-
-                        // Создаем канал для клиента и регистрируем его в селекторе
-                        // Для нас интересно событие, когда клиент будет писать в канал
-                        SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
-                        socketChannel.configureBlocking(false);
-                        socketChannel.register(selector, SelectionKey.OP_READ);
-
+                        accept(key);
                     } else if (key.isReadable()) {
                         log.info("[readable]");
-
-                        // По ключу получаем соответствующий канал
-                        SocketChannel socketChannel = (SocketChannel) key.channel();
-                        readBuffer.clear(); // чистим перед использование
-
-                        int numRead;
-                        try {
-                            // читаем данные в буфер
-                            numRead = socketChannel.read(readBuffer);
-
-                        } catch (IOException e) {
-                            // Ошибка чтения - закроем это соединений и отменим ключ в селекторе
-                            log.error("Failed to read data from channel", e);
-                            key.cancel();
-                            socketChannel.close();
-                            break;
-                        }
-
-                        if (numRead == -1) {
-                            // С нами оборвали соединение со стороны клиента
-                            log.error("Failed to read data from channel (-1)");
-                            key.channel().close();
-                            key.cancel();
-                            break;
-                        }
-
-                        if (numRead > 0) {
-                            Message msg = protocol.decode(Arrays.copyOf(readBuffer.array(), numRead));
-                            //msg.setSender(session.getId());
-                            log.debug("message received: {}", msg);
-                        }
-
-                        log.info("read: {}", new String(readBuffer.array()));
-
-                        // Чтобы читать данные ИЗ буфера, делаем flip()
-                        readBuffer.flip();
-
-                        service.submit(() -> {
-                            dataToWrite.put(socketChannel,readBuffer );
-                            key.interestOps(SelectionKey.OP_WRITE);
-                            selector.wakeup();
-                        });
-
-                        // В качестве эхо-сервера, кладем то, что получили от клиента обратно в канал на запись
-                        //dataToWrite.put(socketChannel, );ByteBuffer.wrap("Hello".getBytes())
-
-                        // Меняем состояние канала - теперь он готов для записи и в следующий select() он будет isWritable();
-
-
+                        read(key);
                     } else if (key.isWritable()) {
                         log.info("[writable]");
-
-                        SocketChannel socketChannel = (SocketChannel) key.channel();
-                        ByteBuffer data = dataToWrite.get(socketChannel);
-                        log.info("write: {}", new String(data.array()));
-
-                        socketChannel.write(data);
-
-                        // Меняем состояние канала - теперь он готов для чтения и в следующий select() он будет isReadable();
-                        key.interestOps(SelectionKey.OP_READ);
+                        write(key);
                     }
                 }
-
-                // Нужно почитстить обработанные евенты
-                keys.clear();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    public void send(SocketChannel socket, byte[] data) {
+        synchronized (changeRequests) {
+            // Indicate we want the interest ops set changed
+            changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
 
-    @Override
-    public void destroyServer() {
+            // And queue the data we want written
+            synchronized (pendingData) {
+                List queue = (List) pendingData.get(socket);
+                if (queue == null) {
+                    queue = new ArrayList();
+                    pendingData.put(socket, queue);
+                }
+                queue.add(ByteBuffer.wrap(data));
+            }
+        }
 
+        // Finally, wake up our selecting thread so it can make the required changes
+        this.selector.wakeup();
+    }
+
+    private void accept(SelectionKey key) throws IOException {
+        // For an accept to be pending the channel must be a server socket channel.
+        ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+
+        // Accept the connection and make it non-blocking
+        SocketChannel socketChannel = serverSocketChannel.accept();
+        socketChannel.configureBlocking(false);
+
+        // Register the new SocketChannel with our Selector, indicating
+        // we'd like to be notified when there's data waiting to be read
+        socketChannel.register(selector, SelectionKey.OP_READ);
+
+        // Добавляем новую сессию и храним ее в sessionManager
+        Session session = sessionManager.createSession();
+        // Добавляем chanel-session в channelManager ( для поиска сессии )
+        channelManager.addChannel(socketChannel, session);
+    }
+
+    private void read(SelectionKey key) throws IOException {
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+
+        // Clear out our read buffer so it's ready for new data
+        readBuffer.clear();
+
+        // Attempt to read off the channel
+        int numRead;
+        try {
+            numRead = socketChannel.read(readBuffer);
+        } catch (IOException e) {
+            // The remote forcibly closed the connection, cancel
+            // the selection key and close the channel.
+            key.cancel();
+            socketChannel.close();
+            return;
+        }
+
+        if (numRead == -1) {
+            // Remote entity shut the socket down cleanly. Do the
+            // same from our end and cancel the channel.
+            key.channel().close();
+            key.cancel();
+            return;
+        }
+
+
+
+        // Hand the data off to our worker thread
+        worker.processData(this, socketChannel, this.readBuffer.array(), numRead);
+
+        //readBuffer.flip();
+    }
+
+    private void write(SelectionKey key) throws IOException {
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+
+        synchronized (pendingData) {
+            List queue = (List) pendingData.get(socketChannel);
+
+            // Write until there's not more data ...
+            while (!queue.isEmpty()) {
+                ByteBuffer buf = (ByteBuffer) queue.get(0);
+
+                socketChannel.write(buf);
+                if (buf.remaining() > 0) {
+                    // ... or the socket's buffer fills up
+                    break;
+                }
+                queue.remove(0);
+            }
+
+            if (queue.isEmpty()) {
+                // We wrote away all data, so we're no longer interested
+                // in writing on this socket. Switch back to waiting for
+                // data.
+                key.interestOps(SelectionKey.OP_READ);
+            }
+        }
     }
 }

@@ -46,5 +46,6 @@ public class RegisterCommand implements Command {
         }
         infoMessage.setInfo(info);
         session.getConnectionHandler().send(infoMessage);
+        //return infoMessage;
     }
 }

@@ -2,6 +2,9 @@ package ru.mail.track.net.nio;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.track.message.Message;
+import ru.mail.track.net.Protocol;
+import ru.mail.track.net.SerializeProtocol;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -27,12 +30,11 @@ public class NioClient {
 
     private Selector selector;
     private SocketChannel channel;
-    private ByteBuffer buffer = ByteBuffer.allocate(16);
+    private ByteBuffer buffer = ByteBuffer.allocate(128);
+    private NioInputHandler inputHandler;
+    private Protocol protocol;
 
     BlockingQueue<String> queue = new ArrayBlockingQueue<>(2);
-
-    // TODO: Нужно создать блокирующую очередь, в которую складывать данные для обмена между потоками
-
 
     public void init() throws Exception {
 
@@ -46,8 +48,6 @@ public class NioClient {
                     log.info("Exit!");
                     System.exit(0);
                 }
-
-                // TODO: здесь нужно сложить прочитанные данные в очередь
 
                 try {
                     queue.put(line);
@@ -65,6 +65,8 @@ public class NioClient {
         });
         t.start();
 
+        this.inputHandler = new NioInputHandler();
+        this.protocol = new SerializeProtocol();
 
         selector = Selector.open();
         channel = SocketChannel.open();
@@ -105,20 +107,21 @@ public class NioClient {
                     if (numRead < 0) {
                         break;
                     }
-                    log.info("From server: {}", new String(buffer.array()));
+
+                    Message msg = protocol.decode(buffer.array());
+
+
+                    //Message msg = protocol.decode(dataCopy);
+                    log.info("From server: {}", msg.toString());
 
                 } else if (sKey.isWritable()) {
                     log.info("[writable]");
 
-                    //TODO: здесь нужно вытащить данные из очереди и отдать их на сервер
-
-                    //byte[] userInput = ...;
-                    //channel.write(ByteBuffer.wrap(userInput));
-
-
                     String line = queue.poll();
+
                     if (line != null) {
-                        channel.write(ByteBuffer.wrap(line.getBytes()));
+                        Message message = inputHandler.processInput(line);
+                        channel.write(ByteBuffer.wrap(protocol.encode(message)));
 
                     }
                     // Ждем записи в канал

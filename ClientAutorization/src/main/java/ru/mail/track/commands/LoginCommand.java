@@ -64,12 +64,13 @@ public class LoginCommand implements Command {
             }
         }
 
+        infoMessage.setInfo(info);
         try {
-            infoMessage.setInfo(info);
             session.getConnectionHandler().send(infoMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //return infoMessage;
 
     }
 }

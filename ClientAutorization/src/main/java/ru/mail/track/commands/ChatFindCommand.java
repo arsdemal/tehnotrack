@@ -39,6 +39,7 @@ public class ChatFindCommand implements ChatCommand {
 
         infoMessage.setInfo(info);
         session.getConnectionHandler().send(infoMessage);
+        //return infoMessage;
 
     }
 }

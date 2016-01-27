@@ -48,12 +48,13 @@ public class SendCommand implements Command {
             info.add("Message sent");
         }
 
+        infoMessage.setInfo(info);
         try {
-            infoMessage.setInfo(info);
             session.getConnectionHandler().send(infoMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //return infoMessage;
 
 
     }

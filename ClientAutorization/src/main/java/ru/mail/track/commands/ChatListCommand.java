@@ -45,5 +45,6 @@ public class ChatListCommand implements ChatCommand {
 
         infoMessage.setInfo(info);
         session.getConnectionHandler().send(infoMessage);
+        //return infoMessage;
     }
 }
