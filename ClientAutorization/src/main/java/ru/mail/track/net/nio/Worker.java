@@ -9,6 +9,7 @@ import ru.mail.track.net.Protocol;
 import ru.mail.track.session.Session;
 
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,7 +86,12 @@ public class Worker implements ConnectionHandler {
 
                 dataEvent = (ServerDataEvent) queue.remove(0);
                 Session session = channelManager.getSession(dataEvent.socket);
-                Message msg = protocol.decode(Arrays.copyOf(dataEvent.data,dataEvent.data.length));
+                Message msg = null;
+                try {
+                    msg = protocol.decode(Arrays.copyOf(dataEvent.data, dataEvent.data.length));
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
+                }
                 msg.setSender(session.getId());
                 log.debug("message received: {}", msg);
 

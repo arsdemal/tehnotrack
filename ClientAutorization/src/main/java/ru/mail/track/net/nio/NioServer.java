@@ -208,7 +208,7 @@ public class NioServer implements Runnable {
         }
 
 
-
+        log.debug("count bytes {}", numRead);
         // Hand the data off to our worker thread
         worker.processData(this, socketChannel, this.readBuffer.array(), numRead);
 

@@ -204,8 +204,11 @@ public class PostgreDAOChat implements DAOChat {
         Long maxId = null;
 
         try {
-            resMaxId.next();
-            maxId = resMaxId.getLong("id") + 1L;
+            if(resMaxId.next()) {
+                maxId = resMaxId.getLong(1) + 1L;
+            } else {
+                maxId = 0L;
+            }
         } catch ( SQLException e) {
             e.printStackTrace();
         } finally {

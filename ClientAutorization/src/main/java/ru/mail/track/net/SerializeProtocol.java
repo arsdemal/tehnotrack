@@ -9,18 +9,21 @@ import java.io.*;
  */
 public class SerializeProtocol implements Protocol {
     @Override
-    public byte[] encode(Message msg) {
+    public byte[] encode(Message msg) throws IOException {
+        ByteArrayOutputStream baos = null;
+        ObjectOutputStream oos = null;
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            baos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(baos);
             oos.writeObject(msg);
             oos.flush();
             baos.flush();
-            oos.close();
-            baos.close();
             return baos.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            oos.close();
+            baos.close();
         }
         return null;
     }

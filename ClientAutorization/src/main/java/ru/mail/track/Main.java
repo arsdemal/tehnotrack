@@ -9,8 +9,8 @@ import ru.mail.track.message.MessageStore;
 import ru.mail.track.message.MessageStoreStub;
 import ru.mail.track.message.UserStore;
 import ru.mail.track.message.UserStoreStub;
+import ru.mail.track.net.ApacheProtocol;
 import ru.mail.track.net.Protocol;
-import ru.mail.track.net.SerializeProtocol;
 import ru.mail.track.net.SessionManager;
 import ru.mail.track.net.nio.NioServer;
 
@@ -23,7 +23,7 @@ public class Main {
 
 
         // Предустановки для серверов
-        Protocol protocol = new SerializeProtocol();
+        Protocol protocol = new ApacheProtocol();
         SessionManager sessionManager = new SessionManager();
 
         PostgreDAOFactory factory = new PostgreDAOFactory();

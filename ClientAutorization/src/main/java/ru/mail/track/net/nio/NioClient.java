@@ -2,9 +2,12 @@ package ru.mail.track.net.nio;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.track.commands.CommandType;
+import ru.mail.track.message.InfoMessage;
 import ru.mail.track.message.Message;
+import ru.mail.track.message.SendMessage;
+import ru.mail.track.net.ApacheProtocol;
 import ru.mail.track.net.Protocol;
-import ru.mail.track.net.SerializeProtocol;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,6 +16,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -30,7 +34,7 @@ public class NioClient {
 
     private Selector selector;
     private SocketChannel channel;
-    private ByteBuffer buffer = ByteBuffer.allocate(128);
+    private ByteBuffer buffer = ByteBuffer.allocate(1024);
     private NioInputHandler inputHandler;
     private Protocol protocol;
 
@@ -66,7 +70,7 @@ public class NioClient {
         t.start();
 
         this.inputHandler = new NioInputHandler();
-        this.protocol = new SerializeProtocol();
+        this.protocol = new ApacheProtocol();
 
         selector = Selector.open();
         channel = SocketChannel.open();
@@ -104,15 +108,31 @@ public class NioClient {
 
                     buffer.clear();
                     int numRead = channel.read(buffer);
-                    if (numRead < 0) {
+                    if (numRead <= 0) {
                         break;
                     }
 
-                    Message msg = protocol.decode(buffer.array());
+                    log.debug("count bytes {}", numRead);
 
+                    byte[] dataCopy = new byte[numRead];
+                    System.arraycopy(buffer.array(), 0, dataCopy, 0, numRead);
 
-                    //Message msg = protocol.decode(dataCopy);
-                    log.info("From server: {}", msg.toString());
+                    Message msg = protocol.decode(dataCopy);
+
+                    CommandType type = msg.getType();
+
+                    log.debug("onMessage: {} type {}", msg, type);
+                    switch (type) {
+                        case MSG_INFO:
+                            InfoMessage infoMsg = (InfoMessage) msg;
+                            List<String> infoList = infoMsg.getInfo();
+                            infoList.forEach(log::info);
+                            break;
+                        case MSG_SEND:
+                            SendMessage sendMsg = (SendMessage) msg;
+                            System.out.println(sendMsg.getMessage());
+                            break;
+                    }
 
                 } else if (sKey.isWritable()) {
                     log.info("[writable]");

@@ -53,11 +53,15 @@ public class NioInputHandler {
                 }
                 break;
             case "send":
-                SendMessage sendMessage = new SendMessage();
-                sendMessage.setType(CommandType.MSG_SEND);
-                sendMessage.setChatId(Long.valueOf(tokens[1]));
-                sendMessage.setMessage(tokens[2]);
-                return sendMessage;
+                if (tokens.length != 3) {
+                    log.info("Invalid input");
+                } else {
+                    SendMessage sendMessage = new SendMessage();
+                    sendMessage.setType(CommandType.MSG_SEND);
+                    sendMessage.setChatId(Long.valueOf(tokens[1]));
+                    sendMessage.setMessage(tokens[2]);
+                    return sendMessage;
+                }
             case "help":
                 HelpMessage helpMessage = new HelpMessage();
                 helpMessage.setType(CommandType.USER_HELP);
@@ -67,40 +71,61 @@ public class NioInputHandler {
                 chatListMessage.setType(CommandType.CHAT_LIST);
                 return chatListMessage;
             case "user":
-                UserMessage userMessage = new UserMessage();
-                userMessage.setType(CommandType.USER_NICK);
-                userMessage.setUserName(tokens[1]);
-                return userMessage;
+                if( tokens.length != 2) {
+                    log.info("Invalid input");
+                } else {
+                    UserMessage userMessage = new UserMessage();
+                    userMessage.setType(CommandType.USER_NICK);
+                    userMessage.setUserName(tokens[1]);
+                    return userMessage;
+                }
             case "user_info":
                 UserInfoMessage infoMsg = new UserInfoMessage();
                 infoMsg.setType(CommandType.USER_INF0);
                 return infoMsg;
             case "user_pass":
-                UserPassMessage passMsg = new UserPassMessage();
-                passMsg.setType(CommandType.USER_PASS);
-                passMsg.setOldPass(tokens[1]);
-                passMsg.setNewPass(tokens[2]);
-                return passMsg;
-            case "chat_create":
-                ChatCreateMessage chatCreateMsg = new ChatCreateMessage();
-                chatCreateMsg.setType(CommandType.CHAT_CREATE);
-                List<Long> usersId = new ArrayList<>();
-                for (int i = 1; i < tokens.length; i++) {
-                    usersId.add(Long.parseLong(tokens[i]));
+                if( tokens.length != 3) {
+                    log.info("Invalid input");
+                } else {
+                    UserPassMessage passMsg = new UserPassMessage();
+                    passMsg.setType(CommandType.USER_PASS);
+                    passMsg.setOldPass(tokens[1]);
+                    passMsg.setNewPass(tokens[2]);
+                    return passMsg;
                 }
-                chatCreateMsg.setUsersId(usersId);
-                return chatCreateMsg;
+            case "chat_create":
+                if( tokens.length < 2) {
+                    log.info("Invalid input");
+                } else {
+                    ChatCreateMessage chatCreateMsg = new ChatCreateMessage();
+                    chatCreateMsg.setType(CommandType.CHAT_CREATE);
+                    List<Long> usersId = new ArrayList<>();
+                    for (int i = 1; i < tokens.length; i++) {
+                        usersId.add(Long.parseLong(tokens[i]));
+                    }
+                    chatCreateMsg.setUsersId(usersId);
+                    return chatCreateMsg;
+                }
+
             case "chat_find":
-                ChatFindMessage findMessage = new ChatFindMessage();
-                findMessage.setType(CommandType.CHAT_FIND);
-                findMessage.setChatId(Long.parseLong(tokens[1]));
-                findMessage.setRegex(tokens[2]);
-                return findMessage;
+                if(tokens.length != 3) {
+                    log.info("Invalid input");
+                } else {
+                    ChatFindMessage findMessage = new ChatFindMessage();
+                    findMessage.setType(CommandType.CHAT_FIND);
+                    findMessage.setChatId(Long.parseLong(tokens[1]));
+                    findMessage.setRegex(tokens[2]);
+                    return findMessage;
+                }
             case "chat_history":
-                ChatHistoryMessage historyMessage = new ChatHistoryMessage();
-                historyMessage.setType(CommandType.CHAT_HISTORY);
-                historyMessage.setChatId(Long.parseLong(tokens[1]));
-                return historyMessage;
+                if(tokens.length != 2) {
+                    log.info("Invalid input");
+                } else {
+                    ChatHistoryMessage historyMessage = new ChatHistoryMessage();
+                    historyMessage.setType(CommandType.CHAT_HISTORY);
+                    historyMessage.setChatId(Long.parseLong(tokens[1]));
+                    return historyMessage;
+                }
             default:
                 System.out.println("Invalid input: " + line);
         }
