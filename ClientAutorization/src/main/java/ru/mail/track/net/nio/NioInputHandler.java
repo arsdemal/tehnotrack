@@ -71,7 +71,7 @@ public class NioInputHandler {
                 chatListMessage.setType(CommandType.CHAT_LIST);
                 return chatListMessage;
             case "user":
-                if( tokens.length != 2) {
+                if (tokens.length != 2) {
                     log.info("Invalid input");
                 } else {
                     UserMessage userMessage = new UserMessage();
@@ -84,7 +84,7 @@ public class NioInputHandler {
                 infoMsg.setType(CommandType.USER_INF0);
                 return infoMsg;
             case "user_pass":
-                if( tokens.length != 3) {
+                if (tokens.length != 3) {
                     log.info("Invalid input");
                 } else {
                     UserPassMessage passMsg = new UserPassMessage();
@@ -94,7 +94,7 @@ public class NioInputHandler {
                     return passMsg;
                 }
             case "chat_create":
-                if( tokens.length < 2) {
+                if (tokens.length < 2) {
                     log.info("Invalid input");
                 } else {
                     ChatCreateMessage chatCreateMsg = new ChatCreateMessage();
@@ -108,7 +108,7 @@ public class NioInputHandler {
                 }
 
             case "chat_find":
-                if(tokens.length != 3) {
+                if (tokens.length != 3) {
                     log.info("Invalid input");
                 } else {
                     ChatFindMessage findMessage = new ChatFindMessage();
@@ -118,7 +118,7 @@ public class NioInputHandler {
                     return findMessage;
                 }
             case "chat_history":
-                if(tokens.length != 2) {
+                if (tokens.length != 2) {
                     log.info("Invalid input");
                 } else {
                     ChatHistoryMessage historyMessage = new ChatHistoryMessage();

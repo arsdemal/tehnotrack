@@ -15,11 +15,11 @@ import java.util.List;
 /**
  *
  */
-public class PostgreDAOChat implements DAOChat {
+public class PostgreDAOMessageStore implements DAOMessageStore {
 
     private final Connection connection;
 
-    public PostgreDAOChat(Connection connection) { this.connection = connection;}
+    public PostgreDAOMessageStore(Connection connection) { this.connection = connection;}
 
     @Override
     public void addChat(List<Long> usersId) throws SQLException {

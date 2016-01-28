@@ -14,7 +14,9 @@ public class UserCommand implements Command {
 
     private UserStore userStore;
 
-    public UserCommand(UserStore userStore) { this.userStore = userStore; }
+    public UserCommand(UserStore userStore) {
+        this.userStore = userStore;
+    }
 
     @Override
     public void execute(Session session, Message message) throws IOException {
@@ -33,6 +35,5 @@ public class UserCommand implements Command {
 
         infoMessage.setInfo(info);
         session.getConnectionHandler().send(session, infoMessage);
-        //return infoMessage;
     }
 }

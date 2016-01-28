@@ -1,6 +1,6 @@
 package ru.mail.track.message;
 
-import ru.mail.track.jdbc.DAOChat;
+import ru.mail.track.jdbc.DAOMessageStore;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -10,10 +10,10 @@ import java.util.List;
  */
 public class MessageStoreStub implements MessageStore {
 
-    private DAOChat chats;
+    private DAOMessageStore chats;
 
-    public MessageStoreStub(DAOChat daoChat){
-        this.chats = daoChat;
+    public MessageStoreStub(DAOMessageStore daoMessageStore){
+        this.chats = daoMessageStore;
     }
 
     @Override

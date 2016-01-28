@@ -36,7 +36,7 @@ public class ChatListCommand implements ChatCommand {
             String chatsId = "";
             // записываем информацию в строку
             List<Long> chatsList = (ArrayList)messageStore.getChatsByUserId(session.getSessionUser().getId());
-            for ( Long chatLong : chatsList) {
+            for (Long chatLong : chatsList) {
                 chatsId += chatLong.toString();
             }
             log.info(chatsId);
@@ -45,6 +45,5 @@ public class ChatListCommand implements ChatCommand {
 
         infoMessage.setInfo(info);
         session.getConnectionHandler().send(session, infoMessage);
-        //return infoMessage;
     }
 }

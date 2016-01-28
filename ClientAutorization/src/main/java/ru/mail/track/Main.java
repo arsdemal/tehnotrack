@@ -2,7 +2,7 @@ package ru.mail.track;
 
 
 import ru.mail.track.commands.*;
-import ru.mail.track.jdbc.DAOChat;
+import ru.mail.track.jdbc.DAOMessageStore;
 import ru.mail.track.jdbc.DAOUser;
 import ru.mail.track.jdbc.PostgreDAOFactory;
 import ru.mail.track.message.MessageStore;
@@ -28,11 +28,11 @@ public class Main {
 
         PostgreDAOFactory factory = new PostgreDAOFactory();
         Connection connection = factory.createConnection();
-        DAOUser daoUser = factory.getUserDAO(connection);
-        DAOChat daoChat = factory.getChatDAO(connection);
+        DAOUser daoUser = factory.getDAOUser(connection);
+        DAOMessageStore daoMessageStore = factory.getDAOMessageStore(connection);
 
         UserStore userStore = new UserStoreStub(daoUser);
-        MessageStore messageStore = new MessageStoreStub(daoChat);
+        MessageStore messageStore = new MessageStoreStub(daoMessageStore);
 
         Map<CommandType, Command> cmds = new HashMap<>();
         cmds.put(CommandType.USER_LOGIN, new LoginCommand(userStore, sessionManager));

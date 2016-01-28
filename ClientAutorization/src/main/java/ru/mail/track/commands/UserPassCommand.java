@@ -22,7 +22,7 @@ public class UserPassCommand implements Command {
         infoMessage.setType(CommandType.MSG_INFO);
         List<String> info = new ArrayList<>();
 
-        if (session.getSessionUser() == null ) {
+        if (session.getSessionUser() == null) {
             info.add("You are not logged in");
         } else {
             if (!session.getSessionUser().getPass().equals(passMsg.getOldPass())) {
@@ -35,6 +35,5 @@ public class UserPassCommand implements Command {
         }
         infoMessage.setInfo(info);
         session.getConnectionHandler().send(session, infoMessage);
-        //return infoMessage;
     }
 }

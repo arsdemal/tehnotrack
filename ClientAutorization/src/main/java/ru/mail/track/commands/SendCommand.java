@@ -33,7 +33,8 @@ public class SendCommand implements Command {
         } else {
             SendMessage sendMessage = (SendMessage) message;
             Chat chat = messageStore.getChatById(sendMessage.getChatId());
-            messageStore.addMessage(chat.getId(), message); // добавили сообщение в хранилище
+            // добавили сообщение в хранилище
+            messageStore.addMessage(chat.getId(), message);
             List<Long> parts = chat.getParticipantIds();
             try {
                 for (Long userId : parts) {
@@ -54,8 +55,5 @@ public class SendCommand implements Command {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //return infoMessage;
-
-
     }
 }

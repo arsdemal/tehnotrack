@@ -9,7 +9,7 @@ import java.util.List;
 /**
  *
  */
-public interface DAOChat {
+public interface DAOMessageStore {
 
     void addChat(List<Long> usersId) throws SQLException;
 

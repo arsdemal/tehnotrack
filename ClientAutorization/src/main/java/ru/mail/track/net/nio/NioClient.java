@@ -52,14 +52,12 @@ public class NioClient {
                     log.info("Exit!");
                     System.exit(0);
                 }
-
                 try {
                     queue.put(line);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
 
                 }
-
                 // Будим селектор
                 SelectionKey key = channel.keyFor(selector);
                 log.info("wake up: {}", key.hashCode());

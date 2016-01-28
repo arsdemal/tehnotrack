@@ -34,15 +34,14 @@ public class LoginCommand implements Command {
         List<String> info = new ArrayList<>();
 
         if (session.getSessionUser() != null) {
-
-            log.info("User {} already logged in.", session.getSessionUser()); // выводим информацию на сервер
-            info.add("User already logged in."); // дублируем сообщение и отправляем пользователю
-
+            // выводим информацию на сервер
+            log.info("User {} already logged in.", session.getSessionUser());
+            // дублируем сообщение и отправляем пользователю
+            info.add("User already logged in.");
         } else {
-
             LoginMessage loginMsg = (LoginMessage) message;
-
-            if (loginMsg.getLogin() != null && loginMsg.getPass() != null) {        // логинимся
+            // логинимся
+            if (loginMsg.getLogin() != null && loginMsg.getPass() != null) {
                 user = userStore.getUser(loginMsg.getLogin(), loginMsg.getPass());
                 if (user == null) {
                     log.info("User {} no exist.", session.getSessionUser());
@@ -52,7 +51,6 @@ public class LoginCommand implements Command {
                 log.info("Incorrect data");
                 info.add("Incorrect data");
             }
-
             if (user != null) {
                 session.setSessionUser(user);
                 sessionManager.registerUser(user.getId(), session.getId());
@@ -70,7 +68,5 @@ public class LoginCommand implements Command {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //return infoMessage;
-
     }
 }

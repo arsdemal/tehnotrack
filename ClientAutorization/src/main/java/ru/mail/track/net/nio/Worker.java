@@ -25,12 +25,11 @@ public class Worker implements ConnectionHandler {
 
     // подписчики
     private List<MessageListener> listeners = new ArrayList<>();
-    private Protocol protocol;
-    private ChannelManager channelManager;
     // очередь на исполнение событий
-    //private List queue = new LinkedList();
     private BlockingQueue eventQueue;
 
+    private Protocol protocol;
+    private ChannelManager channelManager;
     private SocketChannel socket;
     private NioServer server;
 
@@ -77,7 +76,7 @@ public class Worker implements ConnectionHandler {
 
         ServerDataEvent dataEvent = null;
 
-        while(true) {
+        while (true) {
             // Wait for data to become available
             synchronized (eventQueue) {
                 while (eventQueue.isEmpty()) {
@@ -87,7 +86,6 @@ public class Worker implements ConnectionHandler {
                         e.printStackTrace();
                     }
                 }
-
 
                 try {
                     dataEvent = (ServerDataEvent) eventQueue.take();
@@ -104,27 +102,13 @@ public class Worker implements ConnectionHandler {
                     e.printStackTrace();
                 }
 
-
                 msg.setSender(session.getId());
                 log.debug("message received: {}", msg);
-
-                /*if( msg.getType() == CommandType.MSG_SEND) {
-                    SendMessage sendMessage = (SendMessage) msg;
-                    daoChat.
-                }*/
-
                 session.setConnectionHandler(this);
                 server = dataEvent.server;
                 socket = dataEvent.socket;
-
                 notifyListeners(session, msg);
-
-                //Message infoMessage = commandHandler.onMessage(session,);
-
             }
-
-            //Return to sender
         }
-
     }
 }

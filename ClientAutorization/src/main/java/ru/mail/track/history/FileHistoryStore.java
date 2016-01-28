@@ -14,17 +14,16 @@ import java.util.Calendar;
 
 public class FileHistoryStore implements HistoryStore {
 
-    private ArrayList<String> listHistory;
-
     final static Charset ENCODING = StandardCharsets.UTF_8;
     private String FILE_USER_HISTORY_STORE;
 
+    private ArrayList<String> listHistory;
+
     public FileHistoryStore() {
-        listHistory = new ArrayList<String>();
+        listHistory = new ArrayList<>();
     }
 
     @Override
-    // эту функцию нужно выполнить один раз когда войдет юзер
     public void setFileUserId(Integer id) throws IOException {
         FILE_USER_HISTORY_STORE = "C:\\Users\\Arsdemal\\Documents\\Projects\\JAVA\\" +
             "project2\\tehnotrack\\ClientAutorization\\resources\\historystore\\" + id + ".txt";
@@ -42,6 +41,8 @@ public class FileHistoryStore implements HistoryStore {
                 while ((line = reader.readLine()) != null) {
                     listHistory.add(line);
                 }
+            } catch ( IOException e ) {
+                e.printStackTrace();
             }
         }
     }
@@ -90,7 +91,7 @@ public class FileHistoryStore implements HistoryStore {
     public void printHistory(int N) {
         System.out.println(N);
         int listHistorySize = listHistory.size();
-        for ( int i = (listHistorySize - N < 0) ? 0 : listHistorySize - N ; i < listHistorySize - 1; i++) {
+        for (int i = (listHistorySize - N < 0) ? 0 : listHistorySize - N ; i < listHistorySize - 1; i++) {
             System.out.println(listHistory.get(i));
         }
     }

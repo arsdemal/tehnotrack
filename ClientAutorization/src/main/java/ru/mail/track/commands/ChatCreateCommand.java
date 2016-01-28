@@ -34,11 +34,11 @@ public class ChatCreateCommand implements Command{
 
         ChatCreateMessage chatCreateMessage = (ChatCreateMessage) message;
         List<Long> usersId = chatCreateMessage.getUsersId();
-        if ( !usersId.contains(session.getSessionUser().getId())) { // если в списке юзеров нет самого юзера, то добавляем его
+        if (!usersId.contains(session.getSessionUser().getId())) { // если в списке юзеров нет самого юзера, то добавляем его
             usersId.add(session.getSessionUser().getId());
         }
 
-        if ( messageStore.isChatExist(usersId)) {
+        if (messageStore.isChatExist(usersId)) {
             log.info("chat is exist");
             info.add("chat is exist");
         } else {
@@ -48,7 +48,6 @@ public class ChatCreateCommand implements Command{
         }
 
         infoMessage.setInfo(info);
-        //return infoMessage;
         session.getConnectionHandler().send(session, infoMessage);
     }
 }

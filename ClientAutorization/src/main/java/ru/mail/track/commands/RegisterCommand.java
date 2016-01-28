@@ -20,7 +20,7 @@ public class RegisterCommand implements Command {
     private SessionManager sessionManager;
     private UserStore userStore;
 
-    public RegisterCommand (UserStore userStore,SessionManager sessionManager ) {
+    public RegisterCommand (UserStore userStore,SessionManager sessionManager) {
         this.sessionManager = sessionManager;
         this.userStore = userStore;
     }
@@ -33,7 +33,7 @@ public class RegisterCommand implements Command {
         infoMessage.setType(CommandType.MSG_INFO);
         List<String> info = new ArrayList<>();
 
-        if ( userStore.isUserExist(regMsg.getLogin())) {
+        if (userStore.isUserExist(regMsg.getLogin())) {
             log.info("This user already exist");
             info.add("This user already exist");
         } else {
@@ -46,6 +46,5 @@ public class RegisterCommand implements Command {
         }
         infoMessage.setInfo(info);
         session.getConnectionHandler().send(session, infoMessage);
-        //return infoMessage;
     }
 }

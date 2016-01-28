@@ -29,7 +29,5 @@ public class HelpCommand implements Command {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //return infoMessage;
-
     }
 }

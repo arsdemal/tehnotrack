@@ -10,7 +10,7 @@ import java.sql.SQLException;
  */
 public class PostgreDAOFactory extends DAOFactory {
 
-    public static Connection createConnection()  {
+    public static Connection createConnection() {
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -35,17 +35,13 @@ public class PostgreDAOFactory extends DAOFactory {
     }
 
     @Override
-    public DAOChat getChatDAO(Connection connection) {
-        return new PostgreDAOChat(connection);
+    public DAOMessageStore getDAOMessageStore(Connection connection) {
+        return new PostgreDAOMessageStore(connection);
     }
 
     @Override
-    public DAOUser getUserDAO(Connection connection) {
+    public DAOUser getDAOUser(Connection connection) {
         return new PostgreDAOUser(connection);
     }
 
-    @Override
-    public DAOMessage getMessageDAO(Connection connection) {
-        return null;
-    }
 }
