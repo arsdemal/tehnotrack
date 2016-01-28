@@ -5,34 +5,31 @@ import ru.mail.track.session.Session;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
  */
 public class ChannelManager {
-    private Map<SocketChannel, Session> channelMap;
-    private AtomicLong channelCounter = new AtomicLong(0);
+    private Map<SocketChannel, Session> sessionMap;
+    private Map<Session, SocketChannel> channelMap;
 
     public ChannelManager() {
         channelMap = new HashMap<>();
+        sessionMap = new HashMap<>();
     }
 
     public void addChannel(SocketChannel socketChannel, Session session) {
-        channelMap.put(socketChannel,session);
+        channelMap.put(session, socketChannel);
+        sessionMap.put(socketChannel, session);
     }
 
     public Session getSession(SocketChannel socketChannel) {
-        Session session = channelMap.get(socketChannel);
+        Session session = sessionMap.get(socketChannel);
         return session;
     }
 
     public SocketChannel getSocket(Session session) {
-        for ( SocketChannel h : channelMap.keySet()) {
-            if ( channelMap.get(h).equals(session)){
-                return h;
-            }
-        }
-        return null;
+        SocketChannel socketChannel = channelMap.get(session);
+        return socketChannel;
     }
 }
