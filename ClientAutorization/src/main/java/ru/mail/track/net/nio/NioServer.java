@@ -17,6 +17,10 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -53,10 +57,15 @@ public class NioServer implements Runnable {
     //
     private ChannelManager channelManager;
 
+    private ExecutorService service;
+
+    private BlockingQueue<ServerDataEvent> eventQueue = new ArrayBlockingQueue<>(10);
+
 
 
 
     public NioServer(Protocol protocol, SessionManager sessionManager, CommandHandler commandHandler) throws IOException {
+
         this.protocol = protocol;
         this.sessionManager = sessionManager;
         this.channelManager = new ChannelManager();
@@ -66,11 +75,15 @@ public class NioServer implements Runnable {
         selector = initSelector();
 
         // Запускаем обработчиков
-        worker = new Worker(protocol, channelManager);
-        worker.addListener(commandHandler);
-        Thread t = new Thread(worker);
-        t.start();
+        service  = Executors.newFixedThreadPool(5);
 
+        worker = new Worker(protocol, channelManager, eventQueue);
+        worker.addListener(commandHandler);
+
+        service.execute(worker);
+
+        //Thread t = new Thread(worker);
+        //t.start();
 
     }
 
@@ -211,9 +224,9 @@ public class NioServer implements Runnable {
 
         log.debug("count bytes {}", numRead);
         // Hand the data off to our worker thread
-        worker.processData(this, socketChannel, this.readBuffer.array(), numRead);
 
-        //readBuffer.flip();
+        worker.processData(this,socketChannel,readBuffer.array(),numRead);
+
     }
 
     private void write(SelectionKey key) throws IOException {

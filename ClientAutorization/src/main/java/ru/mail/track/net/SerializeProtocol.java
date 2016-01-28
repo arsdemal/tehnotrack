@@ -9,7 +9,7 @@ import java.io.*;
  */
 public class SerializeProtocol implements Protocol {
     @Override
-    public byte[] encode(Message msg) throws IOException {
+    public byte[] encode (Message msg) throws IOException {
         ByteArrayOutputStream baos = null;
         ObjectOutputStream oos = null;
         try {
@@ -29,7 +29,7 @@ public class SerializeProtocol implements Protocol {
     }
 
     @Override
-    public Message decode(byte[] data) {
+    public Message decode (byte[] data) {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(data);
             ObjectInputStream ois = new ObjectInputStream(bais);

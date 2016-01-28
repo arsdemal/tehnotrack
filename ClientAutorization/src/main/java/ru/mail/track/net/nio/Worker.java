@@ -13,8 +13,8 @@ import java.net.ProtocolException;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 /**
  *
@@ -28,22 +28,24 @@ public class Worker implements ConnectionHandler {
     private Protocol protocol;
     private ChannelManager channelManager;
     // очередь на исполнение событий
-    private List queue = new LinkedList();
+    //private List queue = new LinkedList();
+    private BlockingQueue eventQueue;
 
     private SocketChannel socket;
     private NioServer server;
 
-    public Worker(Protocol protocol, ChannelManager channelManager){
+    public Worker(Protocol protocol, ChannelManager channelManager, BlockingQueue eventQueue){
         this.protocol = protocol;
         this.channelManager = channelManager;
+        this.eventQueue = eventQueue;
     }
 
     public void processData(NioServer server, SocketChannel socket, byte[] data, int count) {
         byte[] dataCopy = new byte[count];
         System.arraycopy(data, 0, dataCopy, 0, count);
-        synchronized(queue) {
-            queue.add(new ServerDataEvent(server, socket, dataCopy));
-            queue.notify();
+        synchronized(eventQueue) {
+            eventQueue.add(new ServerDataEvent(server, socket, dataCopy));
+            eventQueue.notify();
         }
     }
 
@@ -73,22 +75,29 @@ public class Worker implements ConnectionHandler {
     @Override
     public void run() {
 
-        ServerDataEvent dataEvent;
+        ServerDataEvent dataEvent = null;
 
         while(true) {
             // Wait for data to become available
-            synchronized (queue) {
-                while (queue.isEmpty()) {
+            synchronized (eventQueue) {
+                while (eventQueue.isEmpty()) {
                     try {
-                        queue.wait();
+                        eventQueue.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
 
-                dataEvent = (ServerDataEvent) queue.remove(0);
+
+                try {
+                    dataEvent = (ServerDataEvent) eventQueue.take();
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 Session session = channelManager.getSession(dataEvent.socket);
                 Message msg = null;
+
                 try {
                     msg = protocol.decode(Arrays.copyOf(dataEvent.data, dataEvent.data.length));
                 } catch (ProtocolException e) {
