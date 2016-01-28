@@ -56,7 +56,6 @@ public class Worker implements ConnectionHandler {
 
     @Override
     public void send(Session session, Message msg) throws IOException {
-
         server.send(channelManager.getSocket(session), protocol.encode(msg));
     }
 
@@ -89,7 +88,6 @@ public class Worker implements ConnectionHandler {
 
                 try {
                     dataEvent = (ServerDataEvent) eventQueue.take();
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

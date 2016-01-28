@@ -19,34 +19,34 @@ public class PostgreDAOUser implements DAOUser {
     }
 
     @Override
-    public void addUser(User user) throws SQLException {
+    public User addUser(User user) {
 
         Statement stmt = null;
-        stmt = connection.createStatement();
-
-        String sqlMaxId = "SELECT MAX(id) FROM \"user\";";
-
-        ResultSet res = stmt.executeQuery(sqlMaxId);
-
-        res.next();
-
-        Long maxId = res.getLong(1) + 1L;
-
-        res.close();
+        ResultSet res = null;
+        Long maxId= null;
+        try {
+            stmt = connection.createStatement();
+            String sqlMaxId = "SELECT MAX(id) FROM \"user\";";
+            res = stmt.executeQuery(sqlMaxId);
+            res.next();
+            maxId = res.getLong(1) + 1L;
+            res.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         String sql = "INSERT INTO \"user\" (ID,LOGIN,PASSWORD) "
                 + "VALUES (" + maxId + ",'" + user.getName()
                 + "','" + user.getPass() + "');";
 
-        stmt.executeUpdate(sql);
-        stmt.close();
-
-        /*try {
-            connection.commit();
+        try {
+            stmt.executeUpdate(sql);
+            stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
-        }*/
-        
+        }
+
+        return user;
     }
 
     @Override
@@ -55,25 +55,34 @@ public class PostgreDAOUser implements DAOUser {
     }
 
     @Override
-    public User getUser(String login, String pass) throws SQLException {
-        Statement stmt = connection.createStatement();
+    public User getUser(String login, String pass) {
 
-        String sql = "SELECT * FROM \"user\" WHERE login = '"+ login + "' AND password = '"+ pass + "';";
-
-        ResultSet res = stmt.executeQuery(sql);
-
+        Statement stmt = null;
+        ResultSet res = null;
         User user = null;
 
-        while (res.next()) {
-            Long id = res.getLong("id");
-            user = new User(login,pass);
-            user.setId(id);
+        try {
+            stmt = connection.createStatement();
+            String sql = "SELECT * FROM \"user\" WHERE login = '" + login + "' AND password = '" + pass + "';";
+            res = stmt.executeQuery(sql);
+            while (res.next()) {
+                Long id = res.getLong("id");
+                user = new User(login, pass);
+                user.setId(id);
+            }
+
+            res.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        res.close();
-        stmt.close();
-
         return user;
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return null;
     }
 
     @Override
@@ -82,19 +91,23 @@ public class PostgreDAOUser implements DAOUser {
     }
 
     @Override
-    public boolean isUserExist(String login) throws SQLException {
+    public boolean isUserExist(String login){
 
-        Statement stmt = connection.createStatement();
+        Statement stmt = null;
+        ResultSet res = null;
 
-        String sql = "SELECT * FROM \"user\" WHERE login = '"+ login + "';";
-        ResultSet res = stmt.executeQuery(sql);
-
-        while (res.next()) {
-            return true;
+        try {
+            stmt = connection.createStatement();
+            String sql = "SELECT * FROM \"user\" WHERE login = '" + login + "';";
+            res = stmt.executeQuery(sql);
+            while (res.next()) {
+                return true;
+            }
+            res.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        res.close();
-        stmt.close();
 
         return false;
     }

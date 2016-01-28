@@ -1,23 +1,22 @@
 package ru.mail.track.jdbc;
 
 import ru.mail.track.message.User;
-
-import java.sql.SQLException;
+import ru.mail.track.message.UserStore;
 
 /**
  *
  */
-public interface DAOUser {
+public interface DAOUser extends UserStore {
 
-    void addUser(User user) throws SQLException;
+    User addUser(User user);
 
     boolean deleteUser();
 
-    User getUser(String login, String pass) throws SQLException;
+    User getUser(String login, String pass);
 
     boolean updateUser();
 
-    boolean isUserExist(String login) throws SQLException;
+    boolean isUserExist(String login);
 
     Long getUserById();
 

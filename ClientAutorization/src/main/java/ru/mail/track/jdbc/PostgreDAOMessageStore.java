@@ -22,26 +22,27 @@ public class PostgreDAOMessageStore implements DAOMessageStore {
     public PostgreDAOMessageStore(Connection connection) { this.connection = connection;}
 
     @Override
-    public void addChat(List<Long> usersId) throws SQLException {
-
+    public void addChat(List<Long> usersId) {
         if (!isChatExist(usersId)) {
 
             Statement stmt = null;
-            stmt = connection.createStatement();
-
-            String sqlMaxId = "SELECT MAX(id) FROM \"chat\"";
-
-            ResultSet res = stmt.executeQuery(sqlMaxId);
-
+            ResultSet res = null;
             Long maxId = null;
+
+            try {
+                stmt = connection.createStatement();
+                String sqlMaxId = "SELECT MAX(id) FROM \"chat\"";
+                res = stmt.executeQuery(sqlMaxId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
             try {
                 res.next();
                 maxId = res.getLong(1) + 1L;
+                res.close();
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                res.close();
             }
 
             try {
@@ -55,25 +56,28 @@ public class PostgreDAOMessageStore implements DAOMessageStore {
                 String sql = "INSERT INTO \"chat\" (ID)"
                         + "VALUES (" + maxId + ");";
                 stmt.executeUpdate(sql);
+                stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                stmt.close();
             }
         }
     }
 
     @Override
-    public boolean isChatExist(List<Long> usersId) throws SQLException {
-
+    public boolean isChatExist(List<Long> usersId){
         Statement stmtChat = null;
-        stmtChat = connection.createStatement();
-
-        String sql = "SELECT * FROM \"chat\";";
         ResultSet resChat = null;
-        resChat = stmtChat.executeQuery(sql);
+        try {
+            stmtChat = connection.createStatement();
+
+            String sql = "SELECT * FROM \"chat\";";
+            resChat = stmtChat.executeQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         List<Long> users = new ArrayList<>();
+
         try {
             while (resChat.next()) {
 
@@ -106,48 +110,57 @@ public class PostgreDAOMessageStore implements DAOMessageStore {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            resChat.close();
-            stmtChat.close();
+            try {
+                resChat.close();
+                stmtChat.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return false;
     }
 
     @Override
-    public List<Long> getChatsByUserId(Long userId) throws SQLException {
+    public List<Long> getChatsByUserId(Long userId){
 
-        Statement stmt = null;
-        stmt = connection.createStatement();
-
-        String sql = "SELECT * FROM \"chat_user\" WHERE id_sender ='" + userId + "';";
         ResultSet res = null;
-        res = stmt.executeQuery(sql);
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            String sql = "SELECT * FROM \"chat_user\" WHERE id_sender ='" + userId + "';";
+            res = stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         List<Long> chats = new ArrayList<>();
         try {
             while (res.next()) {
                 chats.add(res.getLong("id_chat"));
             }
+            stmt.close();
+            res.close();
             return chats;
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            stmt.close();
-            res.close();
         }
 
         return null;
     }
 
     @Override
-    public Chat getChatById(Long chatId) throws SQLException {
+    public Chat getChatById(Long chatId){
 
         Statement stmt = null;
-        stmt = connection.createStatement();
-
-        String sql = "SELECT * FROM \"chat_user\" WHERE id_chat ='" + chatId + "';";
         ResultSet res = null;
-        res = stmt.executeQuery(sql);
+        try {
+            stmt = connection.createStatement();
+            String sql = "SELECT * FROM \"chat_user\" WHERE id_chat ='" + chatId + "';";
+            res = stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         List<Long> users = new ArrayList<>();
         try {
@@ -157,49 +170,57 @@ public class PostgreDAOMessageStore implements DAOMessageStore {
             Chat chat = new Chat();
             chat.setId(chatId);
             chat.setParticipantIds(users);
+            stmt.close();
+            res.close();
             return chat;
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            stmt.close();
-            res.close();
         }
 
         return null;
     }
 
     @Override
-    public List<Long> getMessagesFromChat(Long chatId) throws SQLException {
+    public List<Long> getMessagesFromChat(Long chatId){
 
         Statement stmt = null;
-        stmt = connection.createStatement();
-        String sql = "SELECT * FROM \"message\" WHERE id_chat ='" + chatId + "';";
-        ResultSet res = stmt.executeQuery(sql);
+        ResultSet res = null;
+        try {
+            stmt = connection.createStatement();
+            String sql = "SELECT * FROM \"message\" WHERE id_chat ='" + chatId + "';";
+            res = stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         List<Long> messagesId = new ArrayList<>();
         try {
             while (res.next()) {
                 messagesId.add(res.getLong("id"));
             }
+            stmt.close();
+            res.close();
             return messagesId;
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            stmt.close();
-            res.close();
         }
 
         return null;
     }
 
     @Override
-    public void addMessage(Long chatId, Message message) throws SQLException {
+    public void addMessage(Long chatId, Message message){
 
         Statement stmtMaxId = null;
-        stmtMaxId = connection.createStatement();
-        String sqlMaxId = "SELECT MAX(id) FROM \"message\"";
-        ResultSet resMaxId = stmtMaxId.executeQuery(sqlMaxId);
+        ResultSet resMaxId = null;
+        try {
+            stmtMaxId = connection.createStatement();
+            String sqlMaxId = "SELECT MAX(id) FROM \"message\"";
+            resMaxId = stmtMaxId.executeQuery(sqlMaxId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         Long maxId = null;
 
@@ -209,34 +230,46 @@ public class PostgreDAOMessageStore implements DAOMessageStore {
             } else {
                 maxId = 0L;
             }
-        } catch ( SQLException e) {
-            e.printStackTrace();
-        } finally {
             resMaxId.close();
             stmtMaxId.close();
+        } catch ( SQLException e) {
+            e.printStackTrace();
         }
-
-        Statement stmt = null;
-        stmt = connection.createStatement();
-        SendMessage sendMsg = (SendMessage)message;
-        String sql = "INSERT INTO \"message\" (MESSAGE,ID,ID_CHAT)"
-                + "VALUES ('" + sendMsg.getMessage() + "'," + maxId + ","
-                + chatId + ");";
         try {
+            Statement stmt = null;
+            stmt = connection.createStatement();
+            SendMessage sendMsg = (SendMessage)message;
+            String sql = "INSERT INTO \"message\" (MESSAGE,ID,ID_CHAT)"
+                    + "VALUES ('" + sendMsg.getMessage() + "'," + maxId + ","
+                    + chatId + ");";
             stmt.executeUpdate(sql);
+            stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            stmt.close();
         }
     }
 
     @Override
-    public Message getMessageById(Long messageId) throws SQLException {
+    public void addUserToChat(Long userId, Long chatId) {
+
+    }
+
+    @Override
+    public void createChat(List<Long> usersId) {
+
+    }
+
+    @Override
+    public Message getMessageById(Long messageId){
         Statement stmt = null;
-        stmt = connection.createStatement();
-        String sql = "SELECT * FROM \"message\" WHERE id ='" + messageId + "';";
-        ResultSet res = stmt.executeQuery(sql);
+        ResultSet res = null;
+        try {
+            stmt = connection.createStatement();
+            String sql = "SELECT * FROM \"message\" WHERE id ='" + messageId + "';";
+            res = stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         try {
             res.next();
@@ -244,14 +277,12 @@ public class PostgreDAOMessageStore implements DAOMessageStore {
             sendMsg.setMessage(res.getString("message"));
             sendMsg.setChatId(res.getLong("id_chat"));
             sendMsg.setType(CommandType.MSG_SEND);
+            res.close();
+            stmt.close();
             return sendMsg;
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            res.close();
-            stmt.close();
         }
-
         return null;
     }
 
