@@ -40,7 +40,7 @@ public class NioServer implements Runnable,Server {
     private ExecutorService service;
 
     private List changeRequests = new LinkedList();
-    private Map pendingData = new HashMap();
+    private Map<SocketChannel, List > pendingData = new HashMap();
     private BlockingQueue<ServerDataEvent> eventQueue = new ArrayBlockingQueue<>(10);
     private Future future;
 
@@ -83,9 +83,9 @@ public class NioServer implements Runnable,Server {
             try {
 
                 synchronized(changeRequests) {
-                    Iterator changes = this.changeRequests.iterator();
+                    Iterator<ChangeRequest> changes = this.changeRequests.iterator();
                     while (changes.hasNext()) {
-                        ChangeRequest change = (ChangeRequest) changes.next();
+                        ChangeRequest change = changes.next();
                         switch(change.type) {
                             case ChangeRequest.CHANGEOPS:
                                 SelectionKey key = change.socket.keyFor(this.selector);
@@ -132,7 +132,7 @@ public class NioServer implements Runnable,Server {
             changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
 
             synchronized (pendingData) {
-                List queue = (List) pendingData.get(socket);
+                List queue =  pendingData.get(socket);
                 if (queue == null) {
                     queue = new ArrayList();
                     pendingData.put(socket, queue);
