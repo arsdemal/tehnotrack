@@ -33,24 +33,27 @@ public class NioInputHandler {
                     loginMessage.setLogin(tokens[1]);
                     loginMessage.setPass(tokens[2]);
                     return loginMessage;
-                } else { // регистрируемся
+                } else
+                    if (tokens.length == 1) { // регистрируемся
 
-                    log.info("Enter your login password");
+                            log.info("Enter your login password");
 
-                    RegisterMessage regMsg = new RegisterMessage();
-                    regMsg.setType(CommandType.USER_REG);
+                            RegisterMessage regMsg = new RegisterMessage();
+                            regMsg.setType(CommandType.USER_REG);
 
-                    Scanner scanner = new Scanner(System.in);
-                    String[] regTokens = scanner.nextLine().split(" ");
+                            Scanner scanner = new Scanner(System.in);
+                            String[] regTokens = scanner.nextLine().split(" ");
 
-                    if ( regTokens.length != 2) {
-                        log.info("Incorrect data");
+                            if ( regTokens.length != 2) {
+                                log.info("Incorrect data");
+                            } else {
+                                regMsg.setLogin(regTokens[0]);
+                                regMsg.setPass(regTokens[1]);
+                                return regMsg;
+                            }
                     } else {
-                        regMsg.setLogin(regTokens[0]);
-                        regMsg.setPass(regTokens[1]);
-                        return regMsg;
+                        log.info("Incorrect input");
                     }
-                }
                 break;
             case "send":
                 if (tokens.length != 3) {
@@ -58,7 +61,13 @@ public class NioInputHandler {
                 } else {
                     SendMessage sendMessage = new SendMessage();
                     sendMessage.setType(CommandType.MSG_SEND);
-                    sendMessage.setChatId(Long.valueOf(tokens[1]));
+                    try {
+                        sendMessage.setChatId(Long.valueOf(tokens[1]));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        log.info("Invalid format");
+                        break;
+                    }
                     sendMessage.setMessage(tokens[2]);
                     return sendMessage;
                 }
@@ -100,8 +109,14 @@ public class NioInputHandler {
                     ChatCreateMessage chatCreateMsg = new ChatCreateMessage();
                     chatCreateMsg.setType(CommandType.CHAT_CREATE);
                     List<Long> usersId = new ArrayList<>();
-                    for (int i = 1; i < tokens.length; i++) {
-                        usersId.add(Long.parseLong(tokens[i]));
+                    try {
+                        for (int i = 1; i < tokens.length; i++) {
+                            usersId.add(Long.parseLong(tokens[i]));
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        log.info("Invalid format");
+                        break;
                     }
                     chatCreateMsg.setUsersId(usersId);
                     return chatCreateMsg;
@@ -113,7 +128,13 @@ public class NioInputHandler {
                 } else {
                     ChatFindMessage findMessage = new ChatFindMessage();
                     findMessage.setType(CommandType.CHAT_FIND);
-                    findMessage.setChatId(Long.parseLong(tokens[1]));
+                    try {
+                        findMessage.setChatId(Long.parseLong(tokens[1]));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        log.info("Invalid format");
+                        break;
+                    }
                     findMessage.setRegex(tokens[2]);
                     return findMessage;
                 }
@@ -123,7 +144,13 @@ public class NioInputHandler {
                 } else {
                     ChatHistoryMessage historyMessage = new ChatHistoryMessage();
                     historyMessage.setType(CommandType.CHAT_HISTORY);
-                    historyMessage.setChatId(Long.parseLong(tokens[1]));
+                    try {
+                        historyMessage.setChatId(Long.parseLong(tokens[1]));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        log.info("Invalid format");
+                        break;
+                    }
                     return historyMessage;
                 }
             default:

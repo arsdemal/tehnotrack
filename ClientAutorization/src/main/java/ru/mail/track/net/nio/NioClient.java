@@ -40,6 +40,14 @@ public class NioClient {
 
     BlockingQueue<String> queue = new ArrayBlockingQueue<>(2);
 
+    public void writeToChannel(Message message) throws IOException {
+        channel.write(ByteBuffer.wrap(protocol.encode(message)));
+    }
+
+    public Message processInput(String line) throws IOException {
+        return inputHandler.processInput(line);
+    }
+
     public void init() throws Exception {
 
 
@@ -138,9 +146,8 @@ public class NioClient {
                     String line = queue.poll();
 
                     if (line != null) {
-                        Message message = inputHandler.processInput(line);
-                        channel.write(ByteBuffer.wrap(protocol.encode(message)));
-
+                        writeToChannel(processInput(line));
+                        //channel.write(ByteBuffer.wrap(protocol.encode(message)));
                     }
                     // Ждем записи в канал
                     sKey.interestOps(SelectionKey.OP_READ);
