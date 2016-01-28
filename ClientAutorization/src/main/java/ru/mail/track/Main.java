@@ -13,6 +13,7 @@ import ru.mail.track.net.nio.NioServer;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -42,8 +43,19 @@ public class Main {
 
         CommandHandler handler = new CommandHandler(cmds);
 
-        Thread t = new Thread(new NioServer(protocol,sessionManager,handler));
-        t.start();
+        NioServer server = new NioServer(protocol,sessionManager,handler);
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            String line = scanner.nextLine();
+            if (line.equals("stop")) {
+                server.destroyServer();
+            } else {
+                if (line.equals("start")) {
+                    server.startServer();
+                }
+            }
+        }
 
     }
 

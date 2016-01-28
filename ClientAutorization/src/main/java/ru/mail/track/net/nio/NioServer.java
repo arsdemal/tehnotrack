@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.track.commands.CommandHandler;
 import ru.mail.track.net.Protocol;
+import ru.mail.track.net.Server;
 import ru.mail.track.net.SessionManager;
 import ru.mail.track.session.Session;
 
@@ -17,15 +18,12 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  *
  */
-public class NioServer implements Runnable {
+public class NioServer implements Runnable,Server {
 
     static Logger log = LoggerFactory.getLogger(NioServer.class);
 
@@ -44,6 +42,7 @@ public class NioServer implements Runnable {
     private List changeRequests = new LinkedList();
     private Map pendingData = new HashMap();
     private BlockingQueue<ServerDataEvent> eventQueue = new ArrayBlockingQueue<>(10);
+    private Future future;
 
 
 
@@ -62,7 +61,7 @@ public class NioServer implements Runnable {
         service  = Executors.newFixedThreadPool(5);
         worker = new Worker(protocol, channelManager, eventQueue);
         worker.addListener(commandHandler);
-        service.execute(worker);
+        this.future = service.submit(worker);
 
     }
 
@@ -80,7 +79,7 @@ public class NioServer implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
 
                 synchronized(changeRequests) {
@@ -123,6 +122,9 @@ public class NioServer implements Runnable {
                 e.printStackTrace();
             }
         }
+
+
+
     }
 
     public void send(SocketChannel socket, byte[] data) {
@@ -198,5 +200,20 @@ public class NioServer implements Runnable {
                 key.interestOps(SelectionKey.OP_READ);
             }
         }
+    }
+
+    @Override
+    public void destroyServer() {
+        log.info("Stopping server...");
+        while (!future.isDone());
+        future.cancel(true);
+        Thread.currentThread().interrupt();
+    }
+
+    @Override
+    public void startServer() {
+        log.info("Starting server...");
+        Thread t = new Thread(this);
+        t.start();
     }
 }

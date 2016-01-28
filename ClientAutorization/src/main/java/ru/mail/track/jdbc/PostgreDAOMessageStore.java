@@ -69,7 +69,6 @@ public class PostgreDAOMessageStore implements DAOMessageStore {
         ResultSet resChat = null;
         try {
             stmtChat = connection.createStatement();
-
             String sql = "SELECT * FROM \"chat\";";
             resChat = stmtChat.executeQuery(sql);
         } catch (SQLException e) {

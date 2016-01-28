@@ -51,6 +51,11 @@ public class SocketServer implements Runnable,Server {
     }
 
     @Override
+    public void startServer() {
+
+    }
+
+    @Override
     public void run() {
         log.info("Started, waiting for connection");
 

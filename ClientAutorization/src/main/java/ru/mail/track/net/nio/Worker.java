@@ -75,7 +75,7 @@ public class Worker implements ConnectionHandler {
 
         ServerDataEvent dataEvent = null;
 
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             // Wait for data to become available
             synchronized (eventQueue) {
                 while (eventQueue.isEmpty()) {
